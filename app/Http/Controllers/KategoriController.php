@@ -21,6 +21,8 @@ class KategoriController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'kode_kategori' => 'required|string|max:10|unique:kategori',
+            'id_kategori' => 'required|string|max:10|unique:kategori',
             'nama_kategori' => 'required|string|max:255|unique:kategori',
             'deskripsi' => 'nullable|string'
         ]);
@@ -38,6 +40,8 @@ class KategoriController extends Controller
     public function update(Request $request, Kategori $kategori)
     {
         $request->validate([
+            'kode_kategori' => 'required|string|max:10|unique:kategori,kode_kategori,' . $kategori->id,
+            'id_kategori' => 'required|string|max:10|unique:kategori,id_kategori,' . $kategori->id,
             'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori,' . $kategori->id,
             'deskripsi' => 'nullable|string'
         ]);

@@ -27,6 +27,61 @@
         </div>
     @endif
 
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="GET" action="{{ route('assets.index') }}" class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label for="kategori_id" class="form-label">Kategori</label>
+                    <select class="form-select" id="kategori_id" name="kategori_id">
+                        <option value="">Semua</option>
+                        @foreach($kategori as $kat)
+                            <option value="{{ $kat->id }}" {{ request('kategori_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="jenis_barang_id" class="form-label">Nama Barang</label>
+                    <select class="form-select" id="jenis_barang_id" name="jenis_barang_id">
+                        <option value="">Semua</option>
+                        @foreach($jenisBarang as $jenis)
+                            <option value="{{ $jenis->id }}" {{ request('jenis_barang_id') == $jenis->id ? 'selected' : '' }}>{{ $jenis->nama_barang }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="ruangan_id" class="form-label">Ruangan</label>
+                    <select class="form-select" id="ruangan_id" name="ruangan_id">
+                        <option value="">Semua</option>
+                        @foreach($ruangan as $r)
+                            <option value="{{ $r->id }}" {{ request('ruangan_id') == $r->id ? 'selected' : '' }}>{{ $r->nama_ruangan }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="tahun_id" class="form-label">Tahun</label>
+                    <select class="form-select" id="tahun_id" name="tahun_id">
+                        <option value="">Semua</option>
+                        @foreach($tahun as $t)
+                            <option value="{{ $t->id }}" {{ request('tahun_id') == $t->id ? 'selected' : '' }}>{{ $t->tahun }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="kondisi_id" class="form-label">Kondisi</label>
+                    <select class="form-select" id="kondisi_id" name="kondisi_id">
+                        <option value="">Semua</option>
+                        @foreach($kondisi as $k)
+                            <option value="{{ $k->id }}" {{ request('kondisi_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_kondisi }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i>Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Daftar Barang</h5>
@@ -41,8 +96,10 @@
                                 <th>Kode Inventaris</th>
                                 <th>Nama Barang</th>
                                 <th>Kategori</th>
+                                <th>Jumlah Aset</th>
                                 <th>Ruangan</th>
                                 <th>Kondisi</th>
+                                <th>Harga Per Unit</th>
                                 <th>Tahun</th>
                                 <th>Aksi</th>
                             </tr>
@@ -54,10 +111,10 @@
                                     <td>{{ $asset->kode_inventaris }}</td>
                                     <td>{{ $asset->jenisBarang->nama_barang ?? '-' }}</td>
                                     <td>{{ $asset->kategori->nama_kategori ?? '-' }}</td>
+                                    <td>1</td>
                                     <td>{{ $asset->ruangan->nama_ruangan ?? '-' }}</td>
-                                    <td>
-                                        <span class="badge bg-info">{{ $asset->kondisi->nama_kondisi ?? '-' }}</span>
-                                    </td>
+                                    <td>{{ $asset->kondisi->nama_kondisi ?? '-' }}</td>
+                                    <td>Rp {{ number_format($asset->harga_per_unit ?? 0, 0, ',', '.') }}</td>
                                     <td>{{ $asset->tahun->tahun ?? '-' }}</td>
                                     <td>
                                         <a href="{{ route('assets.edit', $asset->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>

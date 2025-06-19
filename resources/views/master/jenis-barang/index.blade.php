@@ -31,63 +31,52 @@
     @endif
 
     <!-- Data Table -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Daftar Jenis Barang</h5>
-        </div>
-        <div class="card-body">
-            @if($jenisBarang->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No</th>
-                                <th>Nama Barang</th>
-                                <th>Kategori</th>
-                                <th>Deskripsi</th>
-                                <th>Jumlah Aset</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($jenisBarang as $index => $item)
+    @foreach($kategori as $kat)
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Kategori: {{ $kat->kode_kategori }} ({{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }})</h5>
+            </div>
+            <div class="card-body">
+                @if($kat->jenisBarang->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>
-                                        <strong>{{ $item->nama_barang }}</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">{{ $item->kategori->nama_kategori ?? '-' }}</span>
-                                    </td>
-                                    <td>{{ $item->deskripsi ?? '-' }}</td>
-                                    <td>
-                                        <span class="badge bg-primary">{{ $item->assets_count ?? 0 }}</span>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#editJenisBarangModal{{ $item->id }}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                onclick="confirmDelete({{ $item->id }}, '{{ $item->nama_barang }}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
+                                    <th>No</th>
+                                    <th>Kode Barang</th>
+                                    <th>Nama Barang</th>
+                                    <th>Deskripsi</th>
+                                    <th>Aksi</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="text-center py-4">
-                    <i class="fas fa-boxes fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">Belum ada data jenis barang</h5>
-                    <p class="text-muted">Klik tombol "Tambah Jenis Barang" untuk menambahkan data pertama</p>
-                </div>
-            @endif
+                            </thead>
+                            <tbody>
+                                @foreach($kat->jenisBarang as $index => $item)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $item->kode_barang }}</td>
+                                        <td>{{ $item->nama_barang }}</td>
+                                        <td>{{ $item->deskripsi ?? '-' }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editJenisBarangModal{{ $item->id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form action="{{ route('master.jenis-barang.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jenis barang ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-3 text-muted">Belum ada jenis barang untuk kategori ini.</div>
+                @endif
+            </div>
         </div>
-    </div>
+    @endforeach
 </div>
 
 <!-- Add Jenis Barang Modal -->
@@ -97,40 +86,30 @@
             <form action="{{ route('master.jenis-barang.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Tambah Jenis Barang Baru</h5>
+                    <h5 class="modal-title">Tambah Jenis Barang</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nama_barang" class="form-label">Nama Barang <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('nama_barang') is-invalid @enderror" 
-                               id="nama_barang" name="nama_barang" value="{{ old('nama_barang') }}" required>
-                        @error('nama_barang')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
                         <label for="kategori_id" class="form-label">Kategori <span class="text-danger">*</span></label>
-                        <select class="form-select @error('kategori_id') is-invalid @enderror" 
-                                id="kategori_id" name="kategori_id" required>
+                        <select class="form-select" id="kategori_id" name="kategori_id" required>
                             <option value="">Pilih Kategori</option>
                             @foreach($kategori as $kat)
-                                <option value="{{ $kat->id }}" {{ old('kategori_id') == $kat->id ? 'selected' : '' }}>
-                                    {{ $kat->nama_kategori }}
-                                </option>
+                                <option value="{{ $kat->id }}">{{ $kat->nama_kategori }}</option>
                             @endforeach
                         </select>
-                        @error('kategori_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="kode_barang" class="form-label">Kode Barang <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="kode_barang" name="kode_barang" maxlength="10" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nama_barang" class="form-label">Nama Barang <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nama_barang" name="nama_barang" required>
                     </div>
                     <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <textarea class="form-control @error('deskripsi') is-invalid @enderror" 
-                                  id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
-                        @error('deskripsi')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -143,50 +122,50 @@
 </div>
 
 <!-- Edit Jenis Barang Modals -->
-@foreach($jenisBarang as $item)
-<div class="modal fade" id="editJenisBarangModal{{ $item->id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ route('master.jenis-barang.update', $item->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Jenis Barang</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+@foreach($kategori as $kat)
+    @foreach($kat->jenisBarang as $item)
+        <div class="modal fade" id="editJenisBarangModal{{ $item->id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('master.jenis-barang.update', $item->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Jenis Barang</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="nama_barang{{ $item->id }}" class="form-label">Nama Barang <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nama_barang{{ $item->id }}" name="nama_barang" value="{{ $item->nama_barang }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="kategori_id{{ $item->id }}" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                <select class="form-select" id="kategori_id{{ $item->id }}" name="kategori_id" required>
+                                    <option value="">Pilih Kategori</option>
+                                    @foreach($kategori as $katOpt)
+                                        <option value="{{ $katOpt->id }}" {{ $item->kategori_id == $katOpt->id ? 'selected' : '' }}>{{ $katOpt->nama_kategori }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="kode_barang{{ $item->id }}" class="form-label">Kode Barang <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="kode_barang{{ $item->id }}" name="kode_barang" value="{{ $item->kode_barang }}" maxlength="10" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="deskripsi{{ $item->id }}" class="form-label">Deskripsi</label>
+                                <textarea class="form-control" id="deskripsi{{ $item->id }}" name="deskripsi" rows="3">{{ $item->deskripsi }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nama_barang{{ $item->id }}" class="form-label">Nama Barang <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" 
-                               id="nama_barang{{ $item->id }}" name="nama_barang" 
-                               value="{{ $item->nama_barang }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="kategori_id{{ $item->id }}" class="form-label">Kategori <span class="text-danger">*</span></label>
-                        <select class="form-select" id="kategori_id{{ $item->id }}" name="kategori_id" required>
-                            <option value="">Pilih Kategori</option>
-                            @foreach($kategori as $kat)
-                                <option value="{{ $kat->id }}" {{ $item->kategori_id == $kat->id ? 'selected' : '' }}>
-                                    {{ $kat->nama_kategori }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="deskripsi{{ $item->id }}" class="form-label">Deskripsi</label>
-                        <textarea class="form-control" 
-                                  id="deskripsi{{ $item->id }}" name="deskripsi" 
-                                  rows="3">{{ $item->deskripsi }}</textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
+    @endforeach
 @endforeach
 
 <!-- Delete Form -->

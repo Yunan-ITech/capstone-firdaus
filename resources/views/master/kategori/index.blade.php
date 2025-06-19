@@ -7,10 +7,10 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">Master Data Kategori</h1>
-            <p class="text-muted">Kelola data kategori barang</p>
+            <h1 class="h3 mb-0">Master Kategori</h1>
+            <p class="text-muted">Daftar seluruh kategori barang</p>
         </div>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addKategoriModal">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addKategoriModal">
             <i class="fas fa-plus me-2"></i>Tambah Kategori
         </button>
     </div>
@@ -93,25 +93,25 @@
             <form action="{{ route('master.kategori.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Tambah Kategori Baru</h5>
+                    <h5 class="modal-title">Tambah Kategori</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label for="kode_kategori" class="form-label">Kode Kategori <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="kode_kategori" name="kode_kategori" maxlength="10" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_kategori" class="form-label">ID Kategori <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="id_kategori" name="id_kategori" maxlength="10" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="nama_kategori" class="form-label">Nama Kategori <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('nama_kategori') is-invalid @enderror" 
-                               id="nama_kategori" name="nama_kategori" value="{{ old('nama_kategori') }}" required>
-                        @error('nama_kategori')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" required>
                     </div>
                     <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <textarea class="form-control @error('deskripsi') is-invalid @enderror" 
-                                  id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
-                        @error('deskripsi')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

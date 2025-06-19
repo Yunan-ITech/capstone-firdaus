@@ -17,6 +17,8 @@ class Asset extends Model
         'kondisi_id',
         'nomor_urut',
         'kode_inventaris',
+        'harga_per_unit',
+        'deskripsi',
         'keterangan'
     ];
 
