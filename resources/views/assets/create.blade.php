@@ -23,27 +23,6 @@
                 @csrf
                 <div class="row mb-3">
                     <div class="col-md-6 mb-3">
-                        <label for="nomor_urut" class="form-label">Nomor Urut <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control @error('nomor_urut') is-invalid @enderror" id="nomor_urut" name="nomor_urut" value="{{ old('nomor_urut') }}" required>
-                        @error('nomor_urut')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6 mb-3">
-                        <label for="jenis_barang_id" class="form-label">Nama Barang <span class="text-danger">*</span></label>
-                        <select class="form-select @error('jenis_barang_id') is-invalid @enderror" id="jenis_barang_id" name="jenis_barang_id" required>
-                            <option value="">Pilih Jenis Barang</option>
-                            @foreach($jenisBarang as $jenis)
-                                <option value="{{ $jenis->id }}" {{ old('jenis_barang_id') == $jenis->id ? 'selected' : '' }}>{{ $jenis->nama_barang }}</option>
-                            @endforeach
-                        </select>
-                        @error('jenis_barang_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-md-6 mb-3">
                         <label for="kategori_id" class="form-label">Kategori <span class="text-danger">*</span></label>
                         <select class="form-select @error('kategori_id') is-invalid @enderror" id="kategori_id" name="kategori_id" required>
                             <option value="">Pilih Kategori</option>
@@ -52,6 +31,15 @@
                             @endforeach
                         </select>
                         @error('kategori_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="jenis_barang_id" class="form-label">Nama Barang <span class="text-danger">*</span></label>
+                        <select class="form-select @error('jenis_barang_id') is-invalid @enderror" id="jenis_barang_id" name="jenis_barang_id" required disabled>
+                            <option value="">Pilih Kategori terlebih dahulu</option>
+                        </select>
+                        @error('jenis_barang_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -93,6 +81,13 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="harga_per_unit" class="form-label">Harga Per Unit <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('harga_per_unit') is-invalid @enderror" id="harga_per_unit" name="harga_per_unit" value="{{ old('harga_per_unit') }}" min="0" step="0.01" required>
+                        @error('harga_per_unit')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6 mb-3">
@@ -110,4 +105,34 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const kategoriSelect = document.getElementById('kategori_id');
+        const jenisBarangSelect = document.getElementById('jenis_barang_id');
+
+        kategoriSelect.addEventListener('change', function() {
+            const kategoriId = this.value;
+            jenisBarangSelect.innerHTML = '<option value="">Memuat data...</option>';
+            jenisBarangSelect.disabled = true;
+            if (kategoriId) {
+                fetch(`/assets/get-jenis-barang/${kategoriId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let options = '<option value="">Pilih Jenis Barang</option>';
+                        data.forEach(function(jenis) {
+                            options += `<option value="${jenis.id}">${jenis.nama_barang}</option>`;
+                        });
+                        jenisBarangSelect.innerHTML = options;
+                        jenisBarangSelect.disabled = false;
+                    });
+            } else {
+                jenisBarangSelect.innerHTML = '<option value="">Pilih Kategori terlebih dahulu</option>';
+                jenisBarangSelect.disabled = true;
+            }
+        });
+    });
+</script>
 @endsection 

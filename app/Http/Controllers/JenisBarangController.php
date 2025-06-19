@@ -10,9 +10,10 @@ class JenisBarangController extends Controller
 {
     public function index()
     {
-        $jenisBarang = JenisBarang::with(['kategori'])->withCount('assets')->orderBy('nama_barang')->get();
-        $kategori = Kategori::orderBy('nama_kategori')->get();
-        return view('master.jenis-barang.index', compact('jenisBarang', 'kategori'));
+        $kategori = Kategori::with(['jenisBarang' => function($q) {
+            $q->orderBy('nama_barang');
+        }])->orderBy('kode_kategori', 'asc')->get();
+        return view('master.jenis-barang.index', compact('kategori'));
     }
 
     public function create()
