@@ -8,12 +8,34 @@ use App\Models\Kategori;
 
 class JenisBarangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kategori = Kategori::with(['jenisBarang' => function($q) {
-            $q->orderBy('nama_barang');
+        // Ambil semua kategori bersama dengan relasi jenisBarang untuk membuat modal edit
+        $kategoriWithAllItems = Kategori::with(['jenisBarang' => function($q) {
+            $q->orderBy('id', 'desc');
         }])->orderBy('kode_kategori', 'asc')->get();
-        return view('master.jenis-barang.index', compact('kategori'));
+
+        // Siapkan data paginasi untuk setiap kategori
+        $paginators = [];
+        $queryParams = $request->query();
+
+        foreach ($kategoriWithAllItems as $kat) {
+            $pageName = 'page_k' . $kat->id; // Nama parameter halaman unik untuk setiap tabel
+            
+            $paginator = JenisBarang::where('kategori_id', $kat->id)
+                ->latest() // Urutkan berdasarkan data terbaru (created_at DESC)
+                ->paginate(10, ['*'], $pageName);
+            
+            // Tambahkan parameter query lain agar tidak hilang saat pindah halaman
+            $paginator->appends($queryParams);
+
+            $paginators[$kat->id] = $paginator;
+        }
+
+        return view('master.jenis-barang.index', [
+            'kategori' => $kategoriWithAllItems,
+            'paginators' => $paginators,
+        ]);
     }
 
     public function create()
@@ -25,12 +47,15 @@ class JenisBarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_barang' => 'required|string|max:255|unique:jenis_barang',
+            'nama_barang' => 'required|string|max:255|unique:jenis_barang,nama_barang,NULL,id,kategori_id,' . $request->kategori_id,
             'kategori_id' => 'required|exists:kategori,id',
+            'kode_barang' => 'required|string|max:10|unique:jenis_barang,kode_barang,NULL,id,kategori_id,' . $request->kategori_id,
             'deskripsi' => 'nullable|string'
         ]);
 
-        JenisBarang::create($request->all());
+        $data = $request->all();
+
+        JenisBarang::create($data);
 
         return redirect()->route('master.jenis-barang.index')->with('success', 'Jenis barang berhasil ditambahkan');
     }
@@ -44,8 +69,9 @@ class JenisBarangController extends Controller
     public function update(Request $request, JenisBarang $jenisBarang)
     {
         $request->validate([
-            'nama_barang' => 'required|string|max:255|unique:jenis_barang,nama_barang,' . $jenisBarang->id,
+            'nama_barang' => 'required|string|max:255|unique:jenis_barang,nama_barang,' . $jenisBarang->id . ',id,kategori_id,' . $request->kategori_id,
             'kategori_id' => 'required|exists:kategori,id',
+            'kode_barang' => 'required|string|max:10|unique:jenis_barang,kode_barang,' . $jenisBarang->id . ',id,kategori_id,' . $request->kategori_id,
             'deskripsi' => 'nullable|string'
         ]);
 

@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function () {
     // Assets Management
     Route::resource('assets', AssetController::class);
     Route::get('/assets/get-jenis-barang/{kategoriId}', [AssetController::class, 'getJenisBarang'])->name('assets.get-jenis-barang');
+    Route::get('/assets/detail/{kode_inventaris_dasar}', [AssetController::class, 'detail'])->name('assets.detail');
+    Route::post('/assets/detail/{kode_inventaris_dasar}/add-unit', [AssetController::class, 'addUnit'])->name('assets.addUnit');
     
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

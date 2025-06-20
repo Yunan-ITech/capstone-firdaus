@@ -87,38 +87,39 @@
             <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Daftar Barang</h5>
         </div>
         <div class="card-body">
-            @if($assets->count() > 0)
+            @if(count($dataBarang) > 0)
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
                                 <th>No</th>
                                 <th>Kode Inventaris</th>
-                                <th>Nama Barang</th>
+                                <th>Jenis Barang</th>
                                 <th>Kategori</th>
-                                <th>Jumlah Aset</th>
-                                <th>Ruangan</th>
-                                <th>Kondisi</th>
                                 <th>Harga Per Unit</th>
-                                <th>Tahun</th>
+                                <th>Jumlah</th>
+                                <th>Jumlah Baik</th>
+                                <th>Jumlah Rusak</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($assets as $index => $asset)
+                            @foreach($dataBarang as $barang)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $asset->kode_inventaris }}</td>
-                                    <td>{{ $asset->jenisBarang->nama_barang ?? '-' }}</td>
-                                    <td>{{ $asset->kategori->nama_kategori ?? '-' }}</td>
-                                    <td>1</td>
-                                    <td>{{ $asset->ruangan->nama_ruangan ?? '-' }}</td>
-                                    <td>{{ $asset->kondisi->nama_kondisi ?? '-' }}</td>
-                                    <td>Rp {{ number_format($asset->harga_per_unit ?? 0, 0, ',', '.') }}</td>
-                                    <td>{{ $asset->tahun->tahun ?? '-' }}</td>
+                                    <td>{{ $barang['no'] }}</td>
+                                    <td>{{ $barang['kode_inventaris_dasar'] }}</td>
+                                    <td>{{ $barang['nama_barang'] }}</td>
+                                    <td>{{ $barang['kategori'] }}</td>
+                                    <td>Rp {{ number_format($barang['harga_per_unit'] ?? 0, 0, ',', '.') }}</td>
+                                    <td>{{ $barang['jumlah'] }}</td>
+                                    <td>{{ $barang['jumlah_baik'] }}</td>
+                                    <td>{{ $barang['jumlah_rusak'] }}</td>
                                     <td>
-                                        <a href="{{ route('assets.edit', $asset->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
-                                        <form action="{{ route('assets.destroy', $asset->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
+                                        <a href="{{ route('assets.detail', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']]) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-info-circle"></i> Detail
+                                        </a>
+                                        <a href="{{ route('assets.edit', $barang['units']->first()->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                        <form action="{{ route('assets.destroy', $barang['units']->first()->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
@@ -129,6 +130,63 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    
+                </div>
+                <!-- Modal Detail -->
+                @foreach($dataBarang as $barang)
+                <div class="modal fade" id="detailModal{{ $barang['no'] }}" tabindex="-1" aria-labelledby="detailModalLabel{{ $barang['no'] }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="detailModalLabel{{ $barang['no'] }}">Detail Barang</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Kode Inventaris Dasar:</strong> {{ $barang['kode_inventaris_dasar'] }}<br>
+                                        <strong>Kategori:</strong> {{ $barang['kategori'] }}<br>
+                                        <strong>Nama Barang:</strong> {{ $barang['nama_barang'] }}<br>
+                                        <strong>Harga Per Unit:</strong> Rp {{ number_format($barang['harga_per_unit'] ?? 0, 0, ',', '.') }}<br>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Jumlah:</strong> {{ $barang['jumlah'] }}<br>
+                                        <strong>Jumlah Baik:</strong> {{ $barang['jumlah_baik'] }}<br>
+                                        <strong>Jumlah Rusak:</strong> {{ $barang['jumlah_rusak'] }}<br>
+                                    </div>
+                                </div>
+                                <hr>
+                                <h6>Detail Unit Barang</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Kode Inventaris Lengkap</th>
+                                                <th>Ruangan</th>
+                                                <th>Tahun</th>
+                                                <th>Kondisi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($barang['units'] as $i => $unit)
+                                                <tr>
+                                                    <td>{{ $i + 1 }}</td>
+                                                    <td>{{ $unit->kode_inventaris }}</td>
+                                                    <td>{{ $unit->ruangan->nama_ruangan ?? '-' }}</td>
+                                                    <td>{{ $unit->tahun->tahun ?? '-' }}</td>
+                                                    <td>{{ $unit->kondisi->nama_kondisi ?? '-' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             @else
                 <div class="text-center py-4">
                     <i class="fas fa-boxes fa-3x text-muted mb-3"></i>

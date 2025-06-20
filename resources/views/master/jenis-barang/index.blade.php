@@ -34,42 +34,48 @@
     @foreach($kategori as $kat)
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Kategori: {{ $kat->kode_kategori }} ({{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }})</h5>
+                <h5 class="mb-0">Kategori: {{ $kat->nama_kategori }} ({{ $kat->kode_kategori }})</h5>
             </div>
             <div class="card-body">
-                @if($kat->jenisBarang->count() > 0)
+                @php
+                    $paginator = $paginators[$kat->id];
+                @endphp
+                @if($paginator->total() > 0)
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead class="table-light">
                                 <tr>
-                                    <th>No</th>
+                                    <th style="width: 5%;">No</th>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Deskripsi</th>
-                                    <th>Aksi</th>
+                                    <th style="width: 15%;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($kat->jenisBarang as $index => $item)
+                                @foreach($paginator as $item)
                                     <tr>
-                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ ($paginator->currentPage() - 1) * $paginator->perPage() + $loop->iteration }}</td>
                                         <td>{{ $item->kode_barang }}</td>
                                         <td>{{ $item->nama_barang }}</td>
                                         <td>{{ $item->deskripsi ?? '-' }}</td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editJenisBarangModal{{ $item->id }}">
-                                                <i class="fas fa-edit"></i>
+                                                <i class="fas fa-edit"></i> Edit
                                             </button>
                                             <form action="{{ route('master.jenis-barang.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jenis barang ini?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i> Hapus</button>
                                             </form>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $paginator->links() }}
                     </div>
                 @else
                     <div class="text-center py-3 text-muted">Belum ada jenis barang untuk kategori ini.</div>

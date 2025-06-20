@@ -70,18 +70,6 @@
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="kondisi_id" class="form-label">Kondisi <span class="text-danger">*</span></label>
-                        <select class="form-select @error('kondisi_id') is-invalid @enderror" id="kondisi_id" name="kondisi_id" required>
-                            <option value="">Pilih Kondisi</option>
-                            @foreach($kondisi as $k)
-                                <option value="{{ $k->id }}" {{ old('kondisi_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_kondisi }}</option>
-                            @endforeach
-                        </select>
-                        @error('kondisi_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-md-4 mb-3">
                         <label for="harga_per_unit" class="form-label">Harga Per Unit <span class="text-danger">*</span></label>
                         <input type="number" class="form-control @error('harga_per_unit') is-invalid @enderror" id="harga_per_unit" name="harga_per_unit" value="{{ old('harga_per_unit') }}" min="0" step="0.01" required>
                         @error('harga_per_unit')

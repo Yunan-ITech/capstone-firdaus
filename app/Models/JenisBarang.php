@@ -14,7 +14,8 @@ class JenisBarang extends Model
     protected $fillable = [
         'kategori_id',
         'nama_barang',
-        'deskripsi'
+        'deskripsi',
+        'kode_barang'
     ];
 
     public function kategori()
