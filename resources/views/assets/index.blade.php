@@ -30,53 +30,20 @@
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('assets.index') }}" class="row g-3 align-items-end">
-                <div class="col-md-2">
-                    <label for="kategori_id" class="form-label">Kategori</label>
+                <div class="col-md-3">
+                    <label for="kategori_id" class="form-label">Filter Berdasarkan Kategori</label>
                     <select class="form-select" id="kategori_id" name="kategori_id">
-                        <option value="">Semua</option>
+                        <option value="">Semua Kategori</option>
                         @foreach($kategori as $kat)
                             <option value="{{ $kat->id }}" {{ request('kategori_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama_kategori }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label for="jenis_barang_id" class="form-label">Nama Barang</label>
-                    <select class="form-select" id="jenis_barang_id" name="jenis_barang_id">
-                        <option value="">Semua</option>
-                        @foreach($jenisBarang as $jenis)
-                            <option value="{{ $jenis->id }}" {{ request('jenis_barang_id') == $jenis->id ? 'selected' : '' }}>{{ $jenis->nama_barang }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="ruangan_id" class="form-label">Ruangan</label>
-                    <select class="form-select" id="ruangan_id" name="ruangan_id">
-                        <option value="">Semua</option>
-                        @foreach($ruangan as $r)
-                            <option value="{{ $r->id }}" {{ request('ruangan_id') == $r->id ? 'selected' : '' }}>{{ $r->nama_ruangan }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="tahun_id" class="form-label">Tahun</label>
-                    <select class="form-select" id="tahun_id" name="tahun_id">
-                        <option value="">Semua</option>
-                        @foreach($tahun as $t)
-                            <option value="{{ $t->id }}" {{ request('tahun_id') == $t->id ? 'selected' : '' }}>{{ $t->tahun }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="kondisi_id" class="form-label">Kondisi</label>
-                    <select class="form-select" id="kondisi_id" name="kondisi_id">
-                        <option value="">Semua</option>
-                        @foreach($kondisi as $k)
-                            <option value="{{ $k->id }}" {{ request('kondisi_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_kondisi }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i>Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ route('assets.index') }}" class="btn btn-outline-secondary w-100"><i class="fas fa-sync-alt me-2"></i>Reset</a>
                 </div>
             </form>
         </div>
@@ -115,15 +82,22 @@
                                     <td>{{ $barang['jumlah_baik'] }}</td>
                                     <td>{{ $barang['jumlah_rusak'] }}</td>
                                     <td>
-                                        <a href="{{ route('assets.detail', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']]) }}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-info-circle"></i> Detail
+                                        <a href="{{ route('assets.detail', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']]) }}" class="btn btn-sm btn-info" title="Lihat Detail Unit">
+                                            <i class="fas fa-info-circle"></i>
                                         </a>
-                                        <a href="{{ route('assets.edit', $barang['units']->first()->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
-                                        <form action="{{ route('assets.destroy', $barang['units']->first()->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                                        </form>
+                                        <a href="{{ route('assets.editGroup', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']]) }}" class="btn btn-sm btn-outline-primary" title="Edit Grup Barang">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @php
+                                            $firstUnit = \App\Models\Asset::where('kode_inventaris', 'like', $barang['kode_inventaris_dasar'] . '.%')->orderBy('nomor_urut')->first();
+                                        @endphp
+                                        @if($firstUnit)
+                                            <form action="{{ route('assets.destroy', $firstUnit->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus barang ini beserta seluruh unitnya?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Grup Barang"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -131,62 +105,8 @@
                     </table>
                 </div>
                 <div class="d-flex justify-content-center mt-3">
-                    
+                    {{ $dataBarang->onEachSide(1)->links('pagination::bootstrap-5') }}
                 </div>
-                <!-- Modal Detail -->
-                @foreach($dataBarang as $barang)
-                <div class="modal fade" id="detailModal{{ $barang['no'] }}" tabindex="-1" aria-labelledby="detailModalLabel{{ $barang['no'] }}" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="detailModalLabel{{ $barang['no'] }}">Detail Barang</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <strong>Kode Inventaris Dasar:</strong> {{ $barang['kode_inventaris_dasar'] }}<br>
-                                        <strong>Kategori:</strong> {{ $barang['kategori'] }}<br>
-                                        <strong>Nama Barang:</strong> {{ $barang['nama_barang'] }}<br>
-                                        <strong>Harga Per Unit:</strong> Rp {{ number_format($barang['harga_per_unit'] ?? 0, 0, ',', '.') }}<br>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <strong>Jumlah:</strong> {{ $barang['jumlah'] }}<br>
-                                        <strong>Jumlah Baik:</strong> {{ $barang['jumlah_baik'] }}<br>
-                                        <strong>Jumlah Rusak:</strong> {{ $barang['jumlah_rusak'] }}<br>
-                                    </div>
-                                </div>
-                                <hr>
-                                <h6>Detail Unit Barang</h6>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Kode Inventaris Lengkap</th>
-                                                <th>Ruangan</th>
-                                                <th>Tahun</th>
-                                                <th>Kondisi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($barang['units'] as $i => $unit)
-                                                <tr>
-                                                    <td>{{ $i + 1 }}</td>
-                                                    <td>{{ $unit->kode_inventaris }}</td>
-                                                    <td>{{ $unit->ruangan->nama_ruangan ?? '-' }}</td>
-                                                    <td>{{ $unit->tahun->tahun ?? '-' }}</td>
-                                                    <td>{{ $unit->kondisi->nama_kondisi ?? '-' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
             @else
                 <div class="text-center py-4">
                     <i class="fas fa-boxes fa-3x text-muted mb-3"></i>
@@ -197,4 +117,11 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@push('styles')
+<style>
+.pagination { margin-bottom: 0; }
+.pagination .page-link { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
+</style>
+@endpush 

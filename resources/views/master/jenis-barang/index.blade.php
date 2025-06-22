@@ -75,7 +75,7 @@
                         </table>
                     </div>
                     <div class="d-flex justify-content-center mt-3">
-                        {{ $paginator->links() }}
+                        {{ $paginator->onEachSide(1)->links('pagination::bootstrap-5') }}
                     </div>
                 @else
                     <div class="text-center py-3 text-muted">Belum ada jenis barang untuk kategori ini.</div>
@@ -191,4 +191,11 @@ function confirmDelete(id, nama) {
     }
 }
 </script>
-@endsection 
+@endsection
+
+@push('styles')
+<style>
+.pagination { margin-bottom: 0; }
+.pagination .page-link { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
+</style>
+@endpush 

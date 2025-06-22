@@ -7,17 +7,17 @@ use Maatwebsite\Excel\Concerns\FromView;
 
 class AssetsExport implements FromView
 {
-    protected $assets;
+    protected $reportData;
 
-    public function __construct($assets)
+    public function __construct(array $reportData)
     {
-        $this->assets = $assets;
+        $this->reportData = $reportData;
     }
 
     public function view(): View
     {
         return view('reports.export_excel', [
-            'assets' => $this->assets
+            'reportData' => $this->reportData
         ]);
     }
 } 

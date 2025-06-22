@@ -25,7 +25,7 @@
     <table class="header-table">
         <tr>
             <td style="width: 80px;">
-                <img src="{{ public_path('images/logo-klinik-firdaus.jpg') }}" alt="Logo" class="logo">
+                <img src="<?php echo e(public_path('images/logo-klinik-firdaus.jpg')); ?>" alt="Logo" class="logo">
             </td>
             <td class="clinic-info">
                 <h2>KLINIK PRATAMA 24 JAM FIRDAUS</h2>
@@ -40,13 +40,13 @@
         <h3>Laporan Rekapitulasi Aset</h3>
     </div>
 
-    @if($filters['kategori'] || $filters['ruangan'] || $filters['kondisi'])
+    <?php if($filters['kategori'] || $filters['ruangan'] || $filters['kondisi']): ?>
         <p><strong>Filter Aktif:</strong>
-            @if($filters['kategori']) Kategori: {{ $filters['kategori']->nama_kategori }}. @endif
-            @if($filters['ruangan']) Ruangan: {{ $filters['ruangan']->nama_ruangan }}. @endif
-            @if($filters['kondisi']) Kondisi: {{ $filters['kondisi']->nama_kondisi }}. @endif
+            <?php if($filters['kategori']): ?> Kategori: <?php echo e($filters['kategori']->nama_kategori); ?>. <?php endif; ?>
+            <?php if($filters['ruangan']): ?> Ruangan: <?php echo e($filters['ruangan']->nama_ruangan); ?>. <?php endif; ?>
+            <?php if($filters['kondisi']): ?> Kondisi: <?php echo e($filters['kondisi']->nama_kondisi); ?>. <?php endif; ?>
         </p>
-    @endif
+    <?php endif; ?>
 
     <table>
         <thead>
@@ -65,37 +65,38 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($reportData as $data)
+            <?php $__empty_1 = true; $__currentLoopData = $reportData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $data): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr>
-                    <td>{{ $data['no'] }}</td>
-                    <td>{{ $data['kode_inventaris'] }}</td>
-                    <td>{{ $data['nama_barang'] }}</td>
-                    <td>{{ $data['kategori'] }}</td>
-                    <td>{{ $data['ruangan'] }}</td>
-                    <td>{{ $data['kondisi'] }}</td>
-                    <td class="text-right">{{ 'Rp ' . number_format($data['harga_per_unit'], 0, ',', '.') }}</td>
-                    <td>{{ $data['jumlah'] }}</td>
-                    <td>{{ $data['tahun_pengadaan'] }}</td>
-                    <td class="text-right">{{ 'Rp ' . number_format($data['harga_perolehan'], 0, ',', '.') }}</td>
-                    <td>{{ $data['deskripsi'] }}</td>
+                    <td><?php echo e($data['no']); ?></td>
+                    <td><?php echo e($data['kode_inventaris']); ?></td>
+                    <td><?php echo e($data['nama_barang']); ?></td>
+                    <td><?php echo e($data['kategori']); ?></td>
+                    <td><?php echo e($data['ruangan']); ?></td>
+                    <td><?php echo e($data['kondisi']); ?></td>
+                    <td class="text-right"><?php echo e('Rp ' . number_format($data['harga_per_unit'], 0, ',', '.')); ?></td>
+                    <td><?php echo e($data['jumlah']); ?></td>
+                    <td><?php echo e($data['tahun_pengadaan']); ?></td>
+                    <td class="text-right"><?php echo e('Rp ' . number_format($data['harga_perolehan'], 0, ',', '.')); ?></td>
+                    <td><?php echo e($data['deskripsi']); ?></td>
                 </tr>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="11" style="text-align: center;">Tidak ada data yang sesuai dengan filter.</td>
                 </tr>
-            @endforelse
+            <?php endif; ?>
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="9" style="text-align: right;">TOTAL KESELURUHAN</td>
-                <td class="text-right">{{ 'Rp ' . number_format($totalPerolehan, 0, ',', '.') }}</td>
+                <td class="text-right"><?php echo e('Rp ' . number_format($totalPerolehan, 0, ',', '.')); ?></td>
                 <td></td>
             </tr>
         </tfoot>
     </table>
 
     <div class="footer">
-        Laporan ini digenerate oleh Sistem Manajemen Aset Klinik Firdaus | Dicetak pada {{ now()->translatedFormat('d F Y H:i:s') }}
+        Laporan ini digenerate oleh Sistem Manajemen Aset Klinik Firdaus | Dicetak pada <?php echo e(now()->translatedFormat('d F Y H:i:s')); ?>
+
     </div>
 </body>
-</html> 
+</html> <?php /**PATH D:\laragon\www\capstone-firdaus\resources\views/reports/pdf.blade.php ENDPATH**/ ?>

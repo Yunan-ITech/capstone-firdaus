@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Sistem Manajemen Aset Klinik Firdaus')</title>
+    <title><?php echo $__env->yieldContent('title', 'Sistem Manajemen Aset Klinik Firdaus'); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -146,20 +146,20 @@
             }
         }
     </style>
-    @yield('styles')
+    <?php echo $__env->yieldContent('styles'); ?>
 </head>
 <body>
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('images/logo-klinik-firdaus.jpg') }}" alt="Logo Klinik Firdaus" style="width: 80px; height: auto; margin-bottom: 10px;">
+            <img src="<?php echo e(asset('images/logo-klinik-firdaus.jpg')); ?>" alt="Logo Klinik Firdaus" style="width: 80px; height: auto; margin-bottom: 10px;">
             <h3>Klinik Firdaus</h3>
             <p>Sistem Manajemen Aset</p>
         </div>
         
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                <a class="nav-link <?php echo e(request()->routeIs('dashboard') ? 'active' : ''); ?>" href="<?php echo e(route('dashboard')); ?>">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
@@ -169,38 +169,38 @@
                     <i class="fas fa-database"></i> Master Data
                 </a>
                 <div class="submenu">
-                    <a class="nav-link {{ request()->routeIs('master.ruangan.*') ? 'active' : '' }}" href="{{ route('master.ruangan.index') }}">
+                    <a class="nav-link <?php echo e(request()->routeIs('master.ruangan.*') ? 'active' : ''); ?>" href="<?php echo e(route('master.ruangan.index')); ?>">
                         <i class="fas fa-door-open"></i> Ruangan
                     </a>
-                    <a class="nav-link {{ request()->routeIs('master.kategori.*') ? 'active' : '' }}" href="{{ route('master.kategori.index') }}">
+                    <a class="nav-link <?php echo e(request()->routeIs('master.kategori.*') ? 'active' : ''); ?>" href="<?php echo e(route('master.kategori.index')); ?>">
                         <i class="fas fa-tags"></i> Kategori
                     </a>
-                    <a class="nav-link {{ request()->routeIs('master.tahun.*') ? 'active' : '' }}" href="{{ route('master.tahun.index') }}">
+                    <a class="nav-link <?php echo e(request()->routeIs('master.tahun.*') ? 'active' : ''); ?>" href="<?php echo e(route('master.tahun.index')); ?>">
                         <i class="fas fa-calendar"></i> Tahun
                     </a>
-                    <a class="nav-link {{ request()->routeIs('master.jenis-barang.*') ? 'active' : '' }}" href="{{ route('master.jenis-barang.index') }}">
+                    <a class="nav-link <?php echo e(request()->routeIs('master.jenis-barang.*') ? 'active' : ''); ?>" href="<?php echo e(route('master.jenis-barang.index')); ?>">
                         <i class="fas fa-box"></i> Jenis Barang
                     </a>
-                    <a class="nav-link {{ request()->routeIs('master.kondisi.*') ? 'active' : '' }}" href="{{ route('master.kondisi.index') }}">
+                    <a class="nav-link <?php echo e(request()->routeIs('master.kondisi.*') ? 'active' : ''); ?>" href="<?php echo e(route('master.kondisi.index')); ?>">
                         <i class="fas fa-check-circle"></i> Kondisi
                     </a>
                 </div>
             </li>
             
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('assets.*') ? 'active' : '' }}" href="{{ route('assets.index') }}">
+                <a class="nav-link <?php echo e(request()->routeIs('assets.*') ? 'active' : ''); ?>" href="<?php echo e(route('assets.index')); ?>">
                     <i class="fas fa-boxes"></i> Data Barang
                 </a>
             </li>
             
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
+                <a class="nav-link <?php echo e(request()->routeIs('reports.*') ? 'active' : ''); ?>" href="<?php echo e(route('reports.index')); ?>">
                     <i class="fas fa-chart-bar"></i> Laporan
                 </a>
             </li>
             
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('labels.*') ? 'active' : '' }}" href="{{ route('labels.index') }}">
+                <a class="nav-link <?php echo e(request()->routeIs('labels.*') ? 'active' : ''); ?>" href="<?php echo e(route('labels.index')); ?>">
                     <i class="fas fa-print"></i> Cetak Label
                 </a>
             </li>
@@ -219,14 +219,15 @@
                 <div class="ms-auto">
                     <div class="dropdown">
                         <button class="btn btn-link dropdown-toggle text-dark" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-2"></i>{{ Auth::user()->name ?? 'User' }}
+                            <i class="fas fa-user-circle me-2"></i><?php echo e(Auth::user()->name ?? 'User'); ?>
+
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                                    @csrf
+                                <form method="POST" action="<?php echo e(route('logout')); ?>" class="d-inline">
+                                    <?php echo csrf_field(); ?>
                                     <button type="submit" class="dropdown-item">
                                         <i class="fas fa-sign-out-alt me-2"></i>Logout
                                     </button>
@@ -240,21 +241,23 @@
 
         <!-- Content -->
         <div class="content-wrapper">
-            @if(session('success'))
+            <?php if(session('success')): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
+                    <?php echo e(session('success')); ?>
+
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            @if(session('error'))
+            <?php if(session('error')): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
+                    <?php echo e(session('error')); ?>
+
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            @yield('content')
+            <?php echo $__env->yieldContent('content'); ?>
         </div>
     </div>
 
@@ -283,6 +286,6 @@
             });
         });
     </script>
-    @yield('scripts')
+    <?php echo $__env->yieldContent('scripts'); ?>
 </body>
-</html> 
+</html> <?php /**PATH D:\laragon\www\capstone-firdaus\resources\views/layouts/app.blade.php ENDPATH**/ ?>

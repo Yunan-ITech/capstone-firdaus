@@ -7,21 +7,27 @@
             <th>Kategori</th>
             <th>Ruangan</th>
             <th>Kondisi</th>
-            <th>Tahun</th>
+            <th>Harga Per Unit</th>
+            <th>Jumlah</th>
+            <th>Tahun Pengadaan</th>
+            <th>Harga Perolehan</th>
             <th>Deskripsi</th>
         </tr>
     </thead>
     <tbody>
-        @foreach($assets as $index => $asset)
+        @foreach($reportData as $data)
             <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ $asset->kode_inventaris }}</td>
-                <td>{{ $asset->jenisBarang->nama_barang ?? '-' }}</td>
-                <td>{{ $asset->kategori->nama_kategori ?? '-' }}</td>
-                <td>{{ $asset->ruangan->nama_ruangan ?? '-' }}</td>
-                <td>{{ $asset->kondisi->nama_kondisi ?? '-' }}</td>
-                <td>{{ $asset->tahun->tahun ?? '-' }}</td>
-                <td>{{ $asset->deskripsi ?? '-' }}</td>
+                <td>{{ $data['no'] }}</td>
+                <td>{{ $data['kode_inventaris'] }}</td>
+                <td>{{ $data['nama_barang'] }}</td>
+                <td>{{ $data['kategori'] }}</td>
+                <td>{{ $data['ruangan'] }}</td>
+                <td>{{ $data['kondisi'] }}</td>
+                <td>{{ 'Rp ' . number_format($data['harga_per_unit'], 0, ',', '.') }}</td>
+                <td>{{ $data['jumlah'] }}</td>
+                <td>{{ $data['tahun_pengadaan'] }}</td>
+                <td>{{ 'Rp ' . number_format($data['harga_perolehan'], 0, ',', '.') }}</td>
+                <td>{{ $data['deskripsi'] }}</td>
             </tr>
         @endforeach
     </tbody>

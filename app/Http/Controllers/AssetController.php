@@ -21,51 +21,54 @@ class AssetController extends Controller
         $kondisi = Kondisi::orderBy('nama_kondisi')->get();
         $jenisBarang = JenisBarang::orderBy('nama_barang')->get();
 
-        $query = Asset::with(['kategori', 'tahun', 'jenisBarang', 'ruangan', 'kondisi', 'user']);
+        // Query builder untuk Aset
+        $query = Asset::with(['kategori', 'jenisBarang', 'kondisi']);
+
+        // Terapkan filter jika ada
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
         }
-        if ($request->filled('jenis_barang_id')) {
-            $query->where('jenis_barang_id', $request->jenis_barang_id);
-        }
-        if ($request->filled('ruangan_id')) {
-            $query->where('ruangan_id', $request->ruangan_id);
-        }
-        if ($request->filled('tahun_id')) {
-            $query->where('tahun_id', $request->tahun_id);
-        }
-        if ($request->filled('kondisi_id')) {
-            $query->where('kondisi_id', $request->kondisi_id);
-        }
+
+        // Ambil semua unit setelah difilter
         $assets = $query->orderBy('created_at', 'desc')->get();
 
-        // Grouping berdasarkan kode inventaris dasar (tanpa 3 digit urut di belakang)
+        // Group by kode inventaris dasar
         $grouped = $assets->groupBy(function($item) {
-            // Ambil kode inventaris dasar (tanpa 3 digit urut di belakang)
             $parts = explode('.', $item->kode_inventaris);
             array_pop($parts); // hapus 3 digit urut
             return implode('.', $parts);
         });
 
-        $dataBarang = [];
+        $dataBarangArr = [];
         $no = 1;
         foreach ($grouped as $kodeDasar => $items) {
             $first = $items->first();
             $jumlah = $items->count();
             $jumlah_baik = $items->where('kondisi.nama_kondisi', 'Baik')->count();
-            $jumlah_rusak = $items->whereIn('kondisi.nama_kondisi', ['Rusak Ringan', 'Rusak Berat', 'Tidak Layak'])->count();
-            $dataBarang[] = [
+            $jumlah_rusak = $items->filter(function($item) {
+                return $item->kondisi && str_starts_with($item->kondisi->nama_kondisi, 'Rusak');
+            })->count();
+            $dataBarangArr[] = [
                 'no' => $no++,
                 'kode_inventaris_dasar' => $kodeDasar,
                 'kategori' => $first->kategori->nama_kategori ?? '-',
+                'nama_barang' => $first->jenisBarang->nama_barang ?? '-',
                 'harga_per_unit' => $first->harga_per_unit,
                 'jumlah' => $jumlah,
                 'jumlah_baik' => $jumlah_baik,
                 'jumlah_rusak' => $jumlah_rusak,
-                'nama_barang' => $first->jenisBarang->nama_barang ?? '-',
-                'units' => $items,
             ];
         }
+        // Paginate array result
+        $perPage = 10;
+        $page = request()->get('page', 1);
+        $dataBarang = new \Illuminate\Pagination\LengthAwarePaginator(
+            array_slice($dataBarangArr, ($page - 1) * $perPage, $perPage),
+            count($dataBarangArr),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => $request->query()]
+        );
 
         return view('assets.index', compact('dataBarang', 'kategori', 'tahun', 'ruangan', 'kondisi', 'jenisBarang'));
     }
@@ -117,6 +120,8 @@ class AssetController extends Controller
             return back()->withErrors(['jenis_barang_id' => 'Kode inventaris sudah ada, silakan tambah barang lain.'])->withInput();
         }
 
+        // Cari kondisi default (Baik)
+        $kondisiDefault = Kondisi::where('nama_kondisi', 'Baik')->first();
         $asset = new Asset();
         $asset->kode_inventaris = $kodeInventaris;
         $asset->nomor_urut = $nomorUrut;
@@ -124,11 +129,12 @@ class AssetController extends Controller
         $asset->kategori_id = $kategori_id;
         $asset->ruangan_id = $request->ruangan_id;
         $asset->tahun_id = $tahun_id;
+        $asset->kondisi_id = $kondisiDefault ? $kondisiDefault->id : 1;
         $asset->harga_per_unit = $request->harga_per_unit;
         $asset->deskripsi = $request->deskripsi;
         $asset->user_id = auth()->id();
         $asset->save();
-
+        $this->syncMasterBarang($kodeDasar);
         return redirect()->route('assets.index')->with('success', 'Barang berhasil ditambahkan!');
     }
 
@@ -191,8 +197,42 @@ class AssetController extends Controller
 
     public function destroy(Asset $asset)
     {
-        $asset->delete();
-        return redirect()->route('assets.index')->with('success', 'Asset berhasil dihapus');
+        // Dapatkan kode inventaris dasar dari aset yang diberikan
+        $parts = explode('.', $asset->kode_inventaris);
+        array_pop($parts); // Hapus nomor urut
+        $kode_inventaris_dasar = implode('.', $parts);
+
+        // Hapus semua aset (unit) yang memiliki kode inventaris dasar yang sama
+        Asset::where('kode_inventaris', 'like', $kode_inventaris_dasar . '.%')->delete();
+        
+        // Update atau hapus data di master_barang
+        $this->syncMasterBarang($kode_inventaris_dasar);
+
+        return redirect()->route('assets.index')->with('success', 'Grup barang berhasil dihapus beserta seluruh unitnya.');
+    }
+
+    public function editGroup($kode_inventaris_dasar)
+    {
+        $asset = Asset::where('kode_inventaris', 'like', $kode_inventaris_dasar . '.%')->firstOrFail();
+        return view('assets.edit_group', compact('asset', 'kode_inventaris_dasar'));
+    }
+
+    public function updateGroup(Request $request, $kode_inventaris_dasar)
+    {
+        $request->validate([
+            'harga_per_unit' => 'required|numeric|min:0',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        Asset::where('kode_inventaris', 'like', $kode_inventaris_dasar . '.%')
+            ->update([
+                'harga_per_unit' => $request->harga_per_unit,
+                'deskripsi' => $request->deskripsi,
+            ]);
+        
+        $this->syncMasterBarang($kode_inventaris_dasar);
+
+        return redirect()->route('assets.index')->with('success', 'Informasi grup barang berhasil diperbarui.');
     }
 
     public function getJenisBarang($kategoriId)
@@ -203,11 +243,20 @@ class AssetController extends Controller
 
     public function detail($kode_inventaris_dasar)
     {
-        // Ambil semua unit dengan kode inventaris dasar yang sama
         $units = Asset::with(['ruangan', 'tahun', 'kondisi', 'kategori', 'jenisBarang'])
             ->where('kode_inventaris', 'like', $kode_inventaris_dasar . '.%')
-            ->orderBy('nomor_urut')
-            ->get();
+            ->orderBy('nomor_urut');
+        // Filter jika ada request
+        if (request('filter_ruangan')) {
+            $units->where('ruangan_id', request('filter_ruangan'));
+        }
+        if (request('filter_tahun')) {
+            $units->where('tahun_id', request('filter_tahun'));
+        }
+        if (request('filter_kondisi')) {
+            $units->where('kondisi_id', request('filter_kondisi'));
+        }
+        $units = $units->paginate(10)->appends(request()->except('page'));
         if ($units->isEmpty()) {
             abort(404);
         }
@@ -224,6 +273,7 @@ class AssetController extends Controller
             'ruangan_id' => 'required|exists:ruangan,id',
             'tahun_id' => 'required|exists:tahun,id',
             'kondisi_id' => 'required|exists:kondisi,id',
+            'jumlah' => 'required|integer|min:1',
         ]);
         $units = Asset::where('kode_inventaris', 'like', $kode_inventaris_dasar . '.%')->orderBy('nomor_urut')->get();
         if ($units->isEmpty()) {
@@ -231,22 +281,70 @@ class AssetController extends Controller
         }
         $induk = $units->first();
         $nomorUrut = $units->max('nomor_urut') + 1;
-        $kodeInventaris = $kode_inventaris_dasar . '.' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
-        if (Asset::where('kode_inventaris', $kodeInventaris)->exists()) {
-            return back()->withErrors(['ruangan_id' => 'Kode inventaris sudah ada, silakan coba lagi.']);
+        $jumlah = $request->jumlah;
+        for ($i = 0; $i < $jumlah; $i++) {
+            $kodeInventaris = $kode_inventaris_dasar . '.' . str_pad($nomorUrut + $i, 3, '0', STR_PAD_LEFT);
+            if (Asset::where('kode_inventaris', $kodeInventaris)->exists()) {
+                continue;
+            }
+            $asset = new Asset();
+            $asset->kode_inventaris = $kodeInventaris;
+            $asset->nomor_urut = $nomorUrut + $i;
+            $asset->jenis_barang_id = $induk->jenis_barang_id;
+            $asset->kategori_id = $induk->kategori_id;
+            $asset->ruangan_id = $request->ruangan_id;
+            $asset->tahun_id = $request->tahun_id;
+            $asset->kondisi_id = $request->kondisi_id;
+            $asset->harga_per_unit = $induk->harga_per_unit;
+            $asset->deskripsi = $induk->deskripsi;
+            $asset->user_id = auth()->id();
+            $asset->save();
         }
-        $asset = new Asset();
-        $asset->kode_inventaris = $kodeInventaris;
-        $asset->nomor_urut = $nomorUrut;
-        $asset->jenis_barang_id = $induk->jenis_barang_id;
-        $asset->kategori_id = $induk->kategori_id;
-        $asset->ruangan_id = $request->ruangan_id;
-        $asset->tahun_id = $request->tahun_id;
-        $asset->kondisi_id = $request->kondisi_id;
-        $asset->harga_per_unit = $induk->harga_per_unit;
-        $asset->deskripsi = $induk->deskripsi;
-        $asset->user_id = auth()->id();
-        $asset->save();
         return redirect()->route('assets.detail', ['kode_inventaris_dasar' => $kode_inventaris_dasar])->with('success', 'Unit barang berhasil ditambahkan!');
+    }
+
+    public function updateUnit(Request $request, $id)
+    {
+        $request->validate([
+            'ruangan_id' => 'required|exists:ruangan,id',
+            'tahun_id' => 'required|exists:tahun,id',
+            'kondisi_id' => 'required|exists:kondisi,id',
+        ]);
+        $unit = Asset::findOrFail($id);
+        $unit->ruangan_id = $request->ruangan_id;
+        $unit->tahun_id = $request->tahun_id;
+        $unit->kondisi_id = $request->kondisi_id;
+        $unit->save();
+        // Ambil kode inventaris dasar
+        $kodeDasar = implode('.', array_slice(explode('.', $unit->kode_inventaris), 0, 3));
+        $this->syncMasterBarang($kodeDasar);
+        return redirect()->route('assets.detail', ['kode_inventaris_dasar' => $kodeDasar])->with('success', 'Unit barang berhasil diupdate!');
+    }
+
+    public function deleteUnit($id)
+    {
+        $unit = Asset::findOrFail($id);
+        $kodeDasar = implode('.', array_slice(explode('.', $unit->kode_inventaris), 0, 3));
+        $unit->delete();
+        $this->syncMasterBarang($kodeDasar);
+        return redirect()->route('assets.detail', ['kode_inventaris_dasar' => $kodeDasar])->with('success', 'Unit barang berhasil dihapus!');
+    }
+
+    private function syncMasterBarang($kodeDasar)
+    {
+        $allUnits = Asset::with('kondisi')->where('kode_inventaris', 'like', $kodeDasar.'.%')->get();
+        $jumlah = $allUnits->count();
+        $jumlah_baik = $allUnits->where('kondisi.nama_kondisi', 'Baik')->count();
+        $jumlah_rusak = $allUnits->whereIn('kondisi.nama_kondisi', ['Rusak Ringan', 'Rusak Berat', 'Tidak Layak'])->count();
+        $first = $allUnits->first();
+        if (!$first) return;
+        $master = \App\Models\MasterBarang::firstOrNew(['kode_inventaris_dasar' => $kodeDasar]);
+        $master->kategori_id = $first->kategori_id;
+        $master->jenis_barang_id = $first->jenis_barang_id;
+        $master->harga_per_unit = $first->harga_per_unit;
+        $master->jumlah = $jumlah;
+        $master->jumlah_baik = $jumlah_baik;
+        $master->jumlah_rusak = $jumlah_rusak;
+        $master->save();
     }
 } 
