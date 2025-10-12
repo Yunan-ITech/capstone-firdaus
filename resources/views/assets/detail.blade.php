@@ -41,12 +41,13 @@
                     </div>
                     <div class="col-md-1 mb-3">
                         <label for="tahun_id" class="form-label">Tahun <span class="text-danger">*</span></label>
-                        <select class="form-select" id="tahun_id" name="tahun_id" required>
+                        <select class="form-select" id="tahun_id" disabled>
                             <option value="">Pilih Tahun</option>
                             @foreach($tahun as $t)
-                                <option value="{{ $t->id }}">{{ $t->tahun }}</option>
+                                <option value="{{ $t->id }}" {{ $tahunInduk && $tahunInduk->id == $t->id ? 'selected' : '' }}>{{ $t->tahun }}</option>
                             @endforeach
                         </select>
+                        <small class="form-text text-muted">Tahun otomatis mengikuti tahun pengadaan barang induk</small>
                     </div>
                     <div class="col-md-1 mb-3">
                         <label for="kondisi_id" class="form-label">Kondisi <span class="text-danger">*</span></label>
@@ -215,12 +216,14 @@
                     </div>
                     <div class="mb-3">
                         <label for="tahun_id{{ $unit->id }}" class="form-label">Tahun <span class="text-danger">*</span></label>
-                        <select class="form-select" id="tahun_id{{ $unit->id }}" name="tahun_id" required>
+                        <input type="hidden" name="tahun_id" value="{{ $unit->tahun_id }}">
+                        <select class="form-select" id="tahun_id{{ $unit->id }}" disabled>
                             <option value="">Pilih Tahun</option>
                             @foreach($tahun as $t)
                                 <option value="{{ $t->id }}" {{ $unit->tahun_id == $t->id ? 'selected' : '' }}>{{ $t->tahun }}</option>
                             @endforeach
                         </select>
+                        <small class="form-text text-muted">Tahun tidak dapat diubah</small>
                     </div>
                     <div class="mb-3">
                         <label for="kondisi_id{{ $unit->id }}" class="form-label">Kondisi <span class="text-danger">*</span></label>
@@ -241,10 +244,37 @@
     </div>
 </div>
 @endforeach
+
 @push('styles')
 <style>
 .pagination { margin-bottom: 0; }
 .pagination .page-link { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pastikan tahun terisi otomatis dan tidak bisa diubah
+    const tahunSelect = document.getElementById('tahun_id');
+    
+    if (tahunSelect) {
+        // Tambahkan visual indicator bahwa field ini otomatis
+        tahunSelect.style.backgroundColor = '#f8f9fa';
+        tahunSelect.style.cursor = 'not-allowed';
+        
+        // Prevent any interaction dengan select
+        tahunSelect.addEventListener('click', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        tahunSelect.addEventListener('keydown', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    }
+});
+</script>
 @endpush
 @endsection 

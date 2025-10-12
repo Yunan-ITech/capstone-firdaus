@@ -71,7 +71,8 @@
             position: relative;
         }
         
-        .nav-item.has-submenu .nav-link::after {
+        /* Ubah selector agar arrow hanya muncul di Master Data */
+        .nav-item.has-submenu > .nav-link::after {
             content: '\f107';
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
@@ -80,7 +81,7 @@
             transition: transform 0.3s ease;
         }
         
-        .nav-item.has-submenu.open .nav-link::after {
+        .nav-item.has-submenu.open > .nav-link::after {
             transform: rotate(180deg);
         }
         
@@ -146,6 +147,7 @@
             }
         }
     </style>
+    <?php echo $__env->yieldPushContent('styles'); ?>
     <?php echo $__env->yieldContent('styles'); ?>
 </head>
 <body>
@@ -164,7 +166,12 @@
                 </a>
             </li>
             
-            <li class="nav-item has-submenu">
+            <li class="nav-item has-submenu
+                <?php echo e(request()->routeIs('master.ruangan.*') || 
+                   request()->routeIs('master.kategori.*') || 
+                   request()->routeIs('master.tahun.*') || 
+                   request()->routeIs('master.jenis-barang.*') || 
+                   request()->routeIs('master.kondisi.*') ? 'open' : ''); ?>">
                 <a class="nav-link" href="#" onclick="toggleSubmenu(this)">
                     <i class="fas fa-database"></i> Master Data
                 </a>
@@ -286,6 +293,7 @@
             });
         });
     </script>
+    <?php echo $__env->yieldPushContent('scripts'); ?>
     <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html> <?php /**PATH D:\laragon\www\capstone-firdaus\resources\views/layouts/app.blade.php ENDPATH**/ ?>

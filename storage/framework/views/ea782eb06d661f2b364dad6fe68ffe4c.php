@@ -39,12 +39,13 @@
                     </div>
                     <div class="col-md-1 mb-3">
                         <label for="tahun_id" class="form-label">Tahun <span class="text-danger">*</span></label>
-                        <select class="form-select" id="tahun_id" name="tahun_id" required>
+                        <select class="form-select" id="tahun_id" disabled>
                             <option value="">Pilih Tahun</option>
                             <?php $__currentLoopData = $tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($t->id); ?>"><?php echo e($t->tahun); ?></option>
+                                <option value="<?php echo e($t->id); ?>" <?php echo e($tahunInduk && $tahunInduk->id == $t->id ? 'selected' : ''); ?>><?php echo e($t->tahun); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
+                        <small class="form-text text-muted">Tahun otomatis mengikuti tahun pengadaan barang induk</small>
                     </div>
                     <div class="col-md-1 mb-3">
                         <label for="kondisi_id" class="form-label">Kondisi <span class="text-danger">*</span></label>
@@ -214,12 +215,14 @@
                     </div>
                     <div class="mb-3">
                         <label for="tahun_id<?php echo e($unit->id); ?>" class="form-label">Tahun <span class="text-danger">*</span></label>
-                        <select class="form-select" id="tahun_id<?php echo e($unit->id); ?>" name="tahun_id" required>
+                        <input type="hidden" name="tahun_id" value="<?php echo e($unit->tahun_id); ?>">
+                        <select class="form-select" id="tahun_id<?php echo e($unit->id); ?>" disabled>
                             <option value="">Pilih Tahun</option>
                             <?php $__currentLoopData = $tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($t->id); ?>" <?php echo e($unit->tahun_id == $t->id ? 'selected' : ''); ?>><?php echo e($t->tahun); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
+                        <small class="form-text text-muted">Tahun tidak dapat diubah</small>
                     </div>
                     <div class="mb-3">
                         <label for="kondisi_id<?php echo e($unit->id); ?>" class="form-label">Kondisi <span class="text-danger">*</span></label>
@@ -240,11 +243,38 @@
     </div>
 </div>
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
 <?php $__env->startPush('styles'); ?>
 <style>
 .pagination { margin-bottom: 0; }
 .pagination .page-link { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
 </style>
+<?php $__env->stopPush(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pastikan tahun terisi otomatis dan tidak bisa diubah
+    const tahunSelect = document.getElementById('tahun_id');
+    
+    if (tahunSelect) {
+        // Tambahkan visual indicator bahwa field ini otomatis
+        tahunSelect.style.backgroundColor = '#f8f9fa';
+        tahunSelect.style.cursor = 'not-allowed';
+        
+        // Prevent any interaction dengan select
+        tahunSelect.addEventListener('click', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        tahunSelect.addEventListener('keydown', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    }
+});
+</script>
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?> 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\capstone-firdaus\resources\views/assets/detail.blade.php ENDPATH**/ ?>

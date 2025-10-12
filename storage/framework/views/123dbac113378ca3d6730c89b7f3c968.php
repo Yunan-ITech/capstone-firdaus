@@ -12,21 +12,6 @@
         </a>
     </div>
 
-    <?php if(session('success')): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i><?php echo e(session('success')); ?>
-
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif; ?>
-    <?php if(session('error')): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i><?php echo e(session('error')); ?>
-
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif; ?>
-
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="<?php echo e(route('assets.index')); ?>" class="row g-3 align-items-end">
@@ -83,7 +68,7 @@
                                     <td><?php echo e($barang['jumlah_rusak']); ?></td>
                                     <td>
                                         <a href="<?php echo e(route('assets.detail', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']])); ?>" class="btn btn-sm btn-info" title="Lihat Detail Unit">
-                                            <i class="fas fa-info-circle"></i>
+                                            <i class="fas fa-info-circle me-1"></i> Detail
                                         </a>
                                         <a href="<?php echo e(route('assets.editGroup', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']])); ?>" class="btn btn-sm btn-outline-primary" title="Edit Grup Barang">
                                             <i class="fas fa-edit"></i>

@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Edit Grup Barang - Sistem Manajemen Aset Klinik Firdaus'); ?>
 
 <?php $__env->startSection('content'); ?>

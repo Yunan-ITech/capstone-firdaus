@@ -117,6 +117,43 @@
     .card-body::-webkit-scrollbar-thumb:hover {
         background: #764ba2;
     }
+    .recent-item-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(120,80,220,0.04);
+        transition: box-shadow 0.25s, transform 0.25s;
+        cursor: pointer;
+    }
+    .recent-item-card:hover {
+        box-shadow: 0 6px 24px rgba(120,80,220,0.10);
+        transform: translateY(-3px) scale(1.01);
+    }
+    .icon-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9ecef;
+    }
+    .progress {
+        background: #e9ecef;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        border-radius: 8px;
+        transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    }
+    .animate-fade-in {
+        opacity: 0;
+        animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: none; }
+    }
 </style>
 @endsection
 
@@ -201,23 +238,34 @@
     <!-- Recent Activities Row -->
     <div class="row">
         <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Barang Terbaru</h5>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h5 class="mb-0"><i class="fas fa-history me-2 text-primary"></i>Barang Terbaru</h5>
                 </div>
                 <div class="card-body">
                     @if($recentAssets->count() > 0)
                         @foreach($recentAssets as $asset)
-                            <div class="recent-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1">{{ $asset->jenisBarang->nama_barang }}</h6>
-                                        <p class="mb-1 text-muted">{{ $asset->kategori->nama_kategori }} - {{ $asset->ruangan->nama_ruangan }}</p>
-                                        <small class="text-muted">Kode: {{ $asset->kode_inventaris }}</small>
+                            <div class="d-flex align-items-center mb-3 p-2 rounded recent-item-card animate-fade-in">
+                                <div class="me-3 flex-shrink-0">
+                                    <div class="icon-circle bg-light shadow-sm">
+                                        <i class="fas fa-box fa-lg text-secondary"></i>
                                     </div>
-                                    <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $asset->kondisi->nama_kondisi)) }}">
-                                        {{ $asset->kondisi->nama_kondisi }}
-                                    </span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <h6 class="mb-0 me-2">{{ $asset->jenisBarang->nama_barang }}</h6>
+                                        <span class="badge status-badge status-{{ strtolower(str_replace(' ', '-', $asset->kondisi->nama_kondisi)) }} ms-1">
+                                            {{ $asset->kondisi->nama_kondisi }}
+                                        </span>
+                                    </div>
+                                    <div class="small text-muted mb-1">
+                                        <i class="fas fa-calendar-alt me-1"></i> {{ $asset->created_at->format('d M Y') }}
+                                    </div>
+                                    <div class="small text-muted">
+                                        <i class="fas fa-tag me-1"></i> {{ $asset->kategori->nama_kategori }}
+                                        <span class="mx-1">|</span>
+                                        <i class="fas fa-door-open me-1"></i> {{ $asset->ruangan->nama_ruangan }}
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
@@ -227,23 +275,27 @@
                 </div>
             </div>
         </div>
-        
         <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-door-open me-2"></i>Ruangan dengan Barang Terbanyak</h5>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 pb-2">
+                    <h5 class="mb-0"><i class="fas fa-door-open me-2 text-success"></i>Ruangan dengan Barang Terbanyak</h5>
                 </div>
                 <div class="card-body">
                     @if($topRuangan->count() > 0)
-                        @foreach($topRuangan as $ruangan)
-                            <div class="recent-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">{{ $ruangan->ruangan->nama_ruangan }}</h6>
-                                        <p class="mb-0 text-muted">{{ $ruangan->total }} barang</p>
+                        @php $maxBarang = $topRuangan->max('total'); @endphp
+                        @foreach($topRuangan as $i => $ruangan)
+                            <div class="mb-3 animate-fade-in">
+                                <div class="d-flex align-items-center mb-1">
+                                    <div class="icon-circle bg-light shadow-sm me-2">
+                                        <i class="fas fa-door-open text-success"></i>
                                     </div>
-                                    <span class="badge bg-primary">{{ $ruangan->total }}</span>
+                                    <h6 class="mb-0 flex-grow-1">{{ $ruangan->ruangan->nama_ruangan }}</h6>
+                                    <span class="badge bg-primary ms-2">#{{ $i+1 }}</span>
                                 </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ $maxBarang > 0 ? round($ruangan->total/$maxBarang*100) : 0 }}%; background: linear-gradient(90deg,#7b6cf6,#5f4bb6);" aria-valuenow="{{ $ruangan->total }}" aria-valuemin="0" aria-valuemax="{{ $maxBarang }}"></div>
+                                </div>
+                                <div class="small text-muted mt-1">{{ $ruangan->total }} barang</div>
                             </div>
                         @endforeach
                     @else

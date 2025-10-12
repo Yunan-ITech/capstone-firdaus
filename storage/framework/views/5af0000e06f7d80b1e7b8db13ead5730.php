@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Cetak Label Inventaris - Sistem Manajemen Aset Klinik Firdaus'); ?>
 
-@section('title', 'Cetak Label Inventaris - Sistem Manajemen Aset Klinik Firdaus')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -22,45 +20,45 @@
                     <label for="ruangan_id" class="form-label">Ruangan</label>
                     <select class="form-select" id="ruangan_id" name="ruangan_id">
                         <option value="">Semua</option>
-                        @foreach($ruangan as $r)
-                            <option value="{{ $r->id }}" {{ request('ruangan_id') == $r->id ? 'selected' : '' }}>{{ $r->nama_ruangan }}</option>
-                        @endforeach
+                        <?php $__currentLoopData = $ruangan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($r->id); ?>" <?php echo e(request('ruangan_id') == $r->id ? 'selected' : ''); ?>><?php echo e($r->nama_ruangan); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <label for="kondisi_id" class="form-label">Kondisi</label>
                     <select class="form-select" id="kondisi_id" name="kondisi_id">
                         <option value="">Semua</option>
-                        @foreach($kondisi as $k)
-                            <option value="{{ $k->id }}" {{ request('kondisi_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_kondisi }}</option>
-                        @endforeach
+                        <?php $__currentLoopData = $kondisi; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($k->id); ?>" <?php echo e(request('kondisi_id') == $k->id ? 'selected' : ''); ?>><?php echo e($k->nama_kondisi); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <label for="tahun_id" class="form-label">Tahun</label>
                     <select class="form-select" id="tahun_id" name="tahun_id">
                         <option value="">Semua</option>
-                        @foreach($tahun as $t)
-                            <option value="{{ $t->id }}" {{ request('tahun_id') == $t->id ? 'selected' : '' }}>{{ $t->tahun }}</option>
-                        @endforeach
+                        <?php $__currentLoopData = $tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($t->id); ?>" <?php echo e(request('tahun_id') == $t->id ? 'selected' : ''); ?>><?php echo e($t->tahun); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <label for="kategori_id" class="form-label">Kategori</label>
                     <select class="form-select" id="kategori_id" name="kategori_id">
                         <option value="">Semua</option>
-                        @foreach($kategori as $kat)
-                            <option value="{{ $kat->id }}" {{ request('kategori_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama_kategori }}</option>
-                        @endforeach
+                        <?php $__currentLoopData = $kategori; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($kat->id); ?>" <?php echo e(request('kategori_id') == $kat->id ? 'selected' : ''); ?>><?php echo e($kat->nama_kategori); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <label for="jenis_barang_id" class="form-label">Jenis Barang</label>
                     <select class="form-select" id="jenis_barang_id" name="jenis_barang_id">
                         <option value="">Semua</option>
-                        @foreach($jenisBarang as $jenis)
-                            <option value="{{ $jenis->id }}" {{ request('jenis_barang_id') == $jenis->id ? 'selected' : '' }}>{{ $jenis->nama_barang }}</option>
-                        @endforeach
+                        <?php $__currentLoopData = $jenisBarang; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $jenis): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($jenis->id); ?>" <?php echo e(request('jenis_barang_id') == $jenis->id ? 'selected' : ''); ?>><?php echo e($jenis->nama_barang); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
@@ -75,15 +73,15 @@
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
             <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Hasil Pencarian</h5>
             <div class="mt-2 mt-md-0">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="previewAllBtn" {{ $assets->count() == 0 ? 'disabled' : '' }}><i class="fas fa-eye me-1"></i>Pratinjau Semua</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="previewAllBtn" <?php echo e($assets->count() == 0 ? 'disabled' : ''); ?>><i class="fas fa-eye me-1"></i>Pratinjau Semua</button>
                 <button type="button" class="btn btn-outline-info btn-sm" id="previewSelectedBtn" disabled><i class="fas fa-check-double me-1"></i>Pratinjau Terpilih</button>
-                <button type="submit" form="printAllForm" class="btn btn-primary btn-sm" {{ $assets->count() == 0 ? 'disabled' : '' }}><i class="fas fa-print me-1"></i>Cetak Semua Halaman</button>
+                <button type="submit" form="printAllForm" class="btn btn-primary btn-sm" <?php echo e($assets->count() == 0 ? 'disabled' : ''); ?>><i class="fas fa-print me-1"></i>Cetak Semua Halaman</button>
             </div>
         </div>
         <div class="card-body">
-            @if($assets->count() > 0)
-                <form method="POST" action="{{ route('labels.print') }}" target="_blank" id="printSelectedForm">
-                    @csrf
+            <?php if($assets->count() > 0): ?>
+                <form method="POST" action="<?php echo e(route('labels.print')); ?>" target="_blank" id="printSelectedForm">
+                    <?php echo csrf_field(); ?>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
@@ -96,42 +94,43 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($assets as $asset)
+                                <?php $__currentLoopData = $assets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $asset): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td><input type="checkbox" class="asset-checkbox" name="asset_ids[]" value="{{ $asset->id }}"></td>
-                                        <td><strong>{{ $asset->kode_inventaris }}</strong></td>
-                                        <td>{{ $asset->jenisBarang->nama_barang ?? '-' }}</td>
-                                        <td>{{ $asset->ruangan->nama_ruangan ?? '-' }}</td>
-                                        <td>{{ $asset->kondisi->nama_kondisi ?? '-' }}</td>
+                                        <td><input type="checkbox" class="asset-checkbox" name="asset_ids[]" value="<?php echo e($asset->id); ?>"></td>
+                                        <td><strong><?php echo e($asset->kode_inventaris); ?></strong></td>
+                                        <td><?php echo e($asset->jenisBarang->nama_barang ?? '-'); ?></td>
+                                        <td><?php echo e($asset->ruangan->nama_ruangan ?? '-'); ?></td>
+                                        <td><?php echo e($asset->kondisi->nama_kondisi ?? '-'); ?></td>
                                     </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <button type="submit" class="btn btn-success" id="printSelectedBtn" disabled><i class="fas fa-print me-2"></i>Cetak Label Terpilih</button>
-                        {{ $assets->links('pagination::bootstrap-5') }}
+                        <?php echo e($assets->links('pagination::bootstrap-5')); ?>
+
                     </div>
                 </form>
-            @else
+            <?php else: ?>
                 <div class="text-center py-5">
                     <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted">Data barang tidak ditemukan.</h5>
                     <p class="text-muted small">Silakan ubah kriteria filter Anda atau tambahkan data barang baru.</p>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
 <!-- Form untuk Cetak Semua (tersembunyi) -->
-<form method="POST" action="{{ route('labels.print') }}" target="_blank" id="printAllForm" class="d-none">
-    @csrf
-    <input type="hidden" name="ruangan_id" value="{{ request('ruangan_id') }}">
-    <input type="hidden" name="kondisi_id" value="{{ request('kondisi_id') }}">
-    <input type="hidden" name="tahun_id" value="{{ request('tahun_id') }}">
-    <input type="hidden" name="kategori_id" value="{{ request('kategori_id') }}">
-    <input type="hidden" name="jenis_barang_id" value="{{ request('jenis_barang_id') }}">
+<form method="POST" action="<?php echo e(route('labels.print')); ?>" target="_blank" id="printAllForm" class="d-none">
+    <?php echo csrf_field(); ?>
+    <input type="hidden" name="ruangan_id" value="<?php echo e(request('ruangan_id')); ?>">
+    <input type="hidden" name="kondisi_id" value="<?php echo e(request('kondisi_id')); ?>">
+    <input type="hidden" name="tahun_id" value="<?php echo e(request('tahun_id')); ?>">
+    <input type="hidden" name="kategori_id" value="<?php echo e(request('kategori_id')); ?>">
+    <input type="hidden" name="jenis_barang_id" value="<?php echo e(request('jenis_barang_id')); ?>">
     <input type="hidden" name="print_all" value="1">
 </form>
 
@@ -149,9 +148,9 @@
     </div>
   </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // --- Script untuk filter Jenis Barang dinamis ---
@@ -218,12 +217,12 @@ document.addEventListener('DOMContentLoaded', function() {
         previewContent.innerHTML = '<div class="text-center p-5"><span class="spinner-border"></span><p class="mt-2">Memuat pratinjau...</p></div>';
         modal.show();
 
-        fetch("{{ route('labels.print') }}?preview=1", {
+        fetch("<?php echo e(route('labels.print')); ?>?preview=1", {
             method: 'POST',
             body: params,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
             }
         })
         .then(res => res.text())
@@ -241,4 +240,5 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleButtons();
 });
 </script>
-@endsection 
+<?php $__env->stopSection(); ?> 
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\capstone-firdaus\resources\views/labels/index.blade.php ENDPATH**/ ?>

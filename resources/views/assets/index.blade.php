@@ -14,19 +14,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('assets.index') }}" class="row g-3 align-items-end">
@@ -83,7 +70,7 @@
                                     <td>{{ $barang['jumlah_rusak'] }}</td>
                                     <td>
                                         <a href="{{ route('assets.detail', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']]) }}" class="btn btn-sm btn-info" title="Lihat Detail Unit">
-                                            <i class="fas fa-info-circle"></i>
+                                            <i class="fas fa-info-circle me-1"></i> Detail
                                         </a>
                                         <a href="{{ route('assets.editGroup', ['kode_inventaris_dasar' => $barang['kode_inventaris_dasar']]) }}" class="btn btn-sm btn-outline-primary" title="Edit Grup Barang">
                                             <i class="fas fa-edit"></i>

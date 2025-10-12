@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Master Data Jenis Barang - Sistem Manajemen Aset Klinik Firdaus'); ?>
 
-@section('title', 'Master Data Jenis Barang - Sistem Manajemen Aset Klinik Firdaus')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -18,16 +16,16 @@
     <!-- Alert Messages -->
 
     <!-- Data Table -->
-    @foreach($kategori as $kat)
+    <?php $__currentLoopData = $kategori; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Kategori: {{ $kat->nama_kategori }} ({{ $kat->kode_kategori }})</h5>
+                <h5 class="mb-0">Kategori: <?php echo e($kat->nama_kategori); ?> (<?php echo e($kat->kode_kategori); ?>)</h5>
             </div>
             <div class="card-body">
-                @php
+                <?php
                     $paginator = $paginators[$kat->id];
-                @endphp
-                @if($paginator->total() > 0)
+                ?>
+                <?php if($paginator->total() > 0): ?>
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead class="table-light">
@@ -40,44 +38,45 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($paginator as $item)
+                                <?php $__currentLoopData = $paginator; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td>{{ ($paginator->currentPage() - 1) * $paginator->perPage() + $loop->iteration }}</td>
-                                        <td>{{ $item->kode_barang }}</td>
-                                        <td>{{ $item->nama_barang }}</td>
-                                        <td>{{ $item->deskripsi ?? '-' }}</td>
+                                        <td><?php echo e(($paginator->currentPage() - 1) * $paginator->perPage() + $loop->iteration); ?></td>
+                                        <td><?php echo e($item->kode_barang); ?></td>
+                                        <td><?php echo e($item->nama_barang); ?></td>
+                                        <td><?php echo e($item->deskripsi ?? '-'); ?></td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editJenisBarangModal{{ $item->id }}">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editJenisBarangModal<?php echo e($item->id); ?>">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
-                                            <form action="{{ route('master.jenis-barang.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jenis barang ini?')">
-                                                @csrf
-                                                @method('DELETE')
+                                            <form action="<?php echo e(route('master.jenis-barang.destroy', $item->id)); ?>" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jenis barang ini?')">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('DELETE'); ?>
                                                 <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i> Hapus</button>
                                             </form>
                                         </td>
                                     </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>
                     <div class="d-flex justify-content-center mt-3">
-                        {{ $paginator->onEachSide(1)->links('pagination::bootstrap-5') }}
+                        <?php echo e($paginator->onEachSide(1)->links('pagination::bootstrap-5')); ?>
+
                     </div>
-                @else
+                <?php else: ?>
                     <div class="text-center py-3 text-muted">Belum ada jenis barang untuk kategori ini.</div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 </div>
 
 <!-- Add Jenis Barang Modal -->
 <div class="modal fade" id="addJenisBarangModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('master.jenis-barang.store') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('master.jenis-barang.store')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Jenis Barang</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -87,9 +86,9 @@
                         <label for="kategori_id" class="form-label">Kategori <span class="text-danger">*</span></label>
                         <select class="form-select" id="kategori_id" name="kategori_id" required>
                             <option value="">Pilih Kategori</option>
-                            @foreach($kategori as $kat)
-                                <option value="{{ $kat->id }}">{{ $kat->nama_kategori }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $kategori; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($kat->id); ?>"><?php echo e($kat->nama_kategori); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -115,39 +114,39 @@
 </div>
 
 <!-- Edit Jenis Barang Modals -->
-@foreach($kategori as $kat)
-    @foreach($kat->jenisBarang as $item)
-        <div class="modal fade" id="editJenisBarangModal{{ $item->id }}" tabindex="-1">
+<?php $__currentLoopData = $kategori; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <?php $__currentLoopData = $kat->jenisBarang; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="modal fade" id="editJenisBarangModal<?php echo e($item->id); ?>" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="{{ route('master.jenis-barang.update', $item->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
+                    <form action="<?php echo e(route('master.jenis-barang.update', $item->id)); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PUT'); ?>
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Jenis Barang</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label for="nama_barang{{ $item->id }}" class="form-label">Nama Barang <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nama_barang{{ $item->id }}" name="nama_barang" value="{{ $item->nama_barang }}" required>
+                                <label for="nama_barang<?php echo e($item->id); ?>" class="form-label">Nama Barang <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nama_barang<?php echo e($item->id); ?>" name="nama_barang" value="<?php echo e($item->nama_barang); ?>" required>
                             </div>
                             <div class="mb-3">
-                                <label for="kategori_id{{ $item->id }}" class="form-label">Kategori <span class="text-danger">*</span></label>
-                                <select class="form-select" id="kategori_id{{ $item->id }}" name="kategori_id" required>
+                                <label for="kategori_id<?php echo e($item->id); ?>" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                <select class="form-select" id="kategori_id<?php echo e($item->id); ?>" name="kategori_id" required>
                                     <option value="">Pilih Kategori</option>
-                                    @foreach($kategori as $katOpt)
-                                        <option value="{{ $katOpt->id }}" {{ $item->kategori_id == $katOpt->id ? 'selected' : '' }}>{{ $katOpt->nama_kategori }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = $kategori; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $katOpt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($katOpt->id); ?>" <?php echo e($item->kategori_id == $katOpt->id ? 'selected' : ''); ?>><?php echo e($katOpt->nama_kategori); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="kode_barang{{ $item->id }}" class="form-label">Kode Barang <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="kode_barang{{ $item->id }}" name="kode_barang" value="{{ $item->kode_barang }}" maxlength="10" required>
+                                <label for="kode_barang<?php echo e($item->id); ?>" class="form-label">Kode Barang <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="kode_barang<?php echo e($item->id); ?>" name="kode_barang" value="<?php echo e($item->kode_barang); ?>" maxlength="10" required>
                             </div>
                             <div class="mb-3">
-                                <label for="deskripsi{{ $item->id }}" class="form-label">Deskripsi</label>
-                                <textarea class="form-control" id="deskripsi{{ $item->id }}" name="deskripsi" rows="3">{{ $item->deskripsi }}</textarea>
+                                <label for="deskripsi<?php echo e($item->id); ?>" class="form-label">Deskripsi</label>
+                                <textarea class="form-control" id="deskripsi<?php echo e($item->id); ?>" name="deskripsi" rows="3"><?php echo e($item->deskripsi); ?></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -158,17 +157,17 @@
                 </div>
             </div>
         </div>
-    @endforeach
-@endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
 <!-- Delete Form -->
 <form id="deleteForm" method="POST" style="display: none;">
-    @csrf
-    @method('DELETE')
+    <?php echo csrf_field(); ?>
+    <?php echo method_field('DELETE'); ?>
 </form>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
 function confirmDelete(id, nama) {
     if (confirm(`Apakah Anda yakin ingin menghapus jenis barang "${nama}"?`)) {
@@ -178,11 +177,12 @@ function confirmDelete(id, nama) {
     }
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
 .pagination { margin-bottom: 0; }
 .pagination .page-link { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
 </style>
-@endpush 
+<?php $__env->stopPush(); ?> 
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\capstone-firdaus\resources\views/master/jenis-barang/index.blade.php ENDPATH**/ ?>

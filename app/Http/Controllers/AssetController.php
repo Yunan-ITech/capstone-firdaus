@@ -264,14 +264,17 @@ class AssetController extends Controller
         $ruangan = Ruangan::orderBy('nama_ruangan')->get();
         $tahun = Tahun::orderBy('tahun', 'desc')->get();
         $kondisi = Kondisi::orderBy('nama_kondisi')->get();
-        return view('assets.detail', compact('induk', 'units', 'ruangan', 'tahun', 'kondisi', 'kode_inventaris_dasar'));
+        
+        // Ambil tahun dari barang induk untuk auto-fill
+        $tahunInduk = $induk->tahun;
+        
+        return view('assets.detail', compact('induk', 'units', 'ruangan', 'tahun', 'kondisi', 'kode_inventaris_dasar', 'tahunInduk'));
     }
 
     public function addUnit(Request $request, $kode_inventaris_dasar)
     {
         $request->validate([
             'ruangan_id' => 'required|exists:ruangan,id',
-            'tahun_id' => 'required|exists:tahun,id',
             'kondisi_id' => 'required|exists:kondisi,id',
             'jumlah' => 'required|integer|min:1',
         ]);
@@ -293,7 +296,7 @@ class AssetController extends Controller
             $asset->jenis_barang_id = $induk->jenis_barang_id;
             $asset->kategori_id = $induk->kategori_id;
             $asset->ruangan_id = $request->ruangan_id;
-            $asset->tahun_id = $request->tahun_id;
+            $asset->tahun_id = $induk->tahun_id;
             $asset->kondisi_id = $request->kondisi_id;
             $asset->harga_per_unit = $induk->harga_per_unit;
             $asset->deskripsi = $induk->deskripsi;
@@ -307,12 +310,10 @@ class AssetController extends Controller
     {
         $request->validate([
             'ruangan_id' => 'required|exists:ruangan,id',
-            'tahun_id' => 'required|exists:tahun,id',
             'kondisi_id' => 'required|exists:kondisi,id',
         ]);
         $unit = Asset::findOrFail($id);
         $unit->ruangan_id = $request->ruangan_id;
-        $unit->tahun_id = $request->tahun_id;
         $unit->kondisi_id = $request->kondisi_id;
         $unit->save();
         // Ambil kode inventaris dasar
