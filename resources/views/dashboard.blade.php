@@ -163,7 +163,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0">Dashboard</h1>
-            <p class="text-muted">Selamat datang di Sistem Manajemen Aset Klinik Firdaus well</p>
+            <p class="text-muted">Selamat datang di Sistem Manajemen Aset Klinik Firdaus</p>
         </div>
         <div class="text-end">
             <p class="mb-0 text-muted">Tanggal: {{ now()->format('d F Y') }}</p>
