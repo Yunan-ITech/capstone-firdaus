@@ -63,10 +63,13 @@
                                                 data-bs-target="#editTahunModal{{ $item->id }}">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                onclick="confirmDelete({{ $item->id }}, '{{ $item->tahun }}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <form action="{{ route('master.tahun.destroy', $item->id) }}" method="POST" class="d-inline" data-item-name="{{ $item->tahun }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -167,12 +170,5 @@
 
 @section('scripts')
 <script>
-function confirmDelete(id, tahun) {
-    if (confirm(`Apakah Anda yakin ingin menghapus tahun "${tahun}"?`)) {
-        const form = document.getElementById('deleteForm');
-        form.action = `/master/tahun/${id}`;
-        form.submit();
-    }
-}
 </script>
 @endsection 

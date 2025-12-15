@@ -11,6 +11,7 @@ use App\Http\Controllers\JenisBarangController;
 use App\Http\Controllers\KondisiController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\LabelController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,10 +33,29 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middl
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Forgot/Reset Password
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])
+    ->middleware('guest')
+    ->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])
+    ->middleware('guest')
+    ->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])
+    ->middleware('guest')
+    ->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'reset'])
+    ->middleware('guest')
+    ->name('password.update');
+
 // Protected Routes
 Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     
     // Master Data Routes (with master prefix)
     Route::prefix('master')->name('master.')->group(function () {

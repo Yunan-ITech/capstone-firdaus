@@ -40,10 +40,23 @@ class MasterDataSeeder extends Seeder
             ['kode_kategori' => 'K04', 'id_kategori' => '04', 'nama_kategori' => 'Alat Bangunan'],
         ];
 
-        // Ambil id kategori berdasarkan kode_kategori
+        // Simpan kategori ke database terlebih dahulu
+        foreach ($kategori as $kat) {
+            Kategori::updateOrCreate(
+                ['kode_kategori' => $kat['kode_kategori']],
+                $kat
+            );
+        }
+
+        // Ambil id kategori yang baru saja disimpan
         $kategoriMap = [];
         foreach ($kategori as $kat) {
-            $kategoriMap[$kat['kode_kategori']] = Kategori::where('kode_kategori', $kat['kode_kategori'])->first()->id;
+            $kategoriData = Kategori::where('kode_kategori', $kat['kode_kategori'])->first();
+            if ($kategoriData) {
+                $kategoriMap[$kat['kode_kategori']] = $kategoriData->id;
+            } else {
+                throw new \Exception("Gagal membuat kategori: " . $kat['kode_kategori']);
+            }
         }
 
         // Seed Jenis Barang

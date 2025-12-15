@@ -53,10 +53,13 @@
                                                 data-bs-target="#editRuanganModal{{ $item->id }}">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                onclick="confirmDelete({{ $item->id }}, '{{ $item->nama_ruangan }}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <form action="{{ route('master.ruangan.destroy', $item->id) }}" method="POST" class="d-inline delete-form" data-item-name="{{ $item->nama_ruangan }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -146,22 +149,5 @@
     </div>
 </div>
 @endforeach
-
-<!-- Delete Form -->
-<form id="deleteForm" method="POST" style="display: none;">
-    @csrf
-    @method('DELETE')
-</form>
 @endsection
-
-@section('scripts')
-<script>
-function confirmDelete(id, nama) {
-    if (confirm(`Apakah Anda yakin ingin menghapus ruangan "${nama}"?`)) {
-        const form = document.getElementById('deleteForm');
-        form.action = `/master/ruangan/${id}`;
-        form.submit();
-    }
-}
-</script>
-@endsection 
+ 
