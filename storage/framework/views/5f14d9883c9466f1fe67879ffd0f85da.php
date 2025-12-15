@@ -154,24 +154,24 @@
 <body>
     <div class="login-container">
         <div class="login-header">
-            <img src="{{ asset('images/logo-klinik-firdaus.jpg') }}" alt="Logo Klinik Firdaus" style="width: 100px; height: auto; margin-bottom: 1rem;">
+            <img src="<?php echo e(asset('images/logo-klinik-firdaus.jpg')); ?>" alt="Logo Klinik Firdaus" style="width: 100px; height: auto; margin-bottom: 1rem;">
             <h1>Klinik Firdaus</h1>
             <p>Sistem Manajemen Aset</p>
         </div>
         
         <div class="login-body">
-            @if ($errors->any())
+            <?php if($errors->any()): ?>
                 <div class="alert alert-danger">
                     <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+            <form method="POST" action="<?php echo e(route('login')); ?>">
+                <?php echo csrf_field(); ?>
                 
                 <div class="form-group">
                     <label for="email" class="form-label">Email</label>
@@ -180,17 +180,31 @@
                             <i class="fas fa-envelope"></i>
                         </span>
                         <input type="email" 
-                               class="form-control @error('email') is-invalid @enderror" 
+                               class="form-control <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" 
                                id="email" 
                                name="email" 
-                               value="{{ old('email') }}" 
+                               value="<?php echo e(old('email')); ?>" 
                                placeholder="Masukkan email Anda"
                                required 
                                autofocus>
                     </div>
-                    @error('email')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
+                    <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div class="form-group">
@@ -200,15 +214,29 @@
                             <i class="fas fa-lock"></i>
                         </span>
                         <input type="password" 
-                               class="form-control @error('password') is-invalid @enderror" 
+                               class="form-control <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" 
                                id="password" 
                                name="password" 
                                placeholder="Masukkan password Anda"
                                required>
                     </div>
-                    @error('password')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
+                    <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div class="form-group mb-2">
@@ -224,7 +252,7 @@
         </div>
         
         <div class="login-footer">
-            <p>&copy; {{ date('Y') }} Klinik Firdaus. All rights reserved.</p>
+            <p>&copy; <?php echo e(date('Y')); ?> Klinik Firdaus. All rights reserved.</p>
             <p>Developed with <i class="fas fa-heart text-danger"></i> for better healthcare management</p>
         </div>
     </div>
@@ -237,23 +265,38 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    @if (session('status'))
+                    <?php if(session('status')): ?>
                         <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+                            <?php echo e(session('status')); ?>
 
-                    <form method="POST" action="{{ route('password.email') }}">
-                        @csrf
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="POST" action="<?php echo e(route('password.email')); ?>">
+                        <?php echo csrf_field(); ?>
 
                         <div class="mb-3">
                             <label for="reset-email" class="form-label">Alamat Email</label>
-                            <input id="reset-email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autofocus>
-                            @error('email')
+                            <input id="reset-email" type="email" class="form-control <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" name="email" value="<?php echo e(old('email')); ?>" required autofocus>
+                            <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                 <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
+                                    <strong><?php echo e($message); ?></strong>
                                 </span>
-                            @enderror
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="mb-3 text-end">
@@ -269,14 +312,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            @if (session('show_forgot_modal') || session('status'))
+            <?php if(session('show_forgot_modal') || session('status')): ?>
                 var forgotModal = document.getElementById('forgotPasswordModal');
                 if (forgotModal) {
                     var modal = new bootstrap.Modal(forgotModal);
                     modal.show();
                 }
-            @endif
+            <?php endif; ?>
         });
     </script>
  </body>
- </html>
+ </html><?php /**PATH C:\laragon\www\capstone-firdaus\resources\views/auth/login.blade.php ENDPATH**/ ?>

@@ -127,7 +127,7 @@
                                     <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUnitModal{{ $unit->id }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form action="{{ route('assets.deleteUnit', $unit->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus unit ini?')">
+                                    <form action="{{ route('assets.deleteUnit', $unit->id) }}" method="POST" class="d-inline" data-item-name="{{ $unit->kode_inventaris }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>

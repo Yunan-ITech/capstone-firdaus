@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Dashboard - Sistem Manajemen Aset Klinik Firdaus'); ?>
 
-@section('title', 'Dashboard - Sistem Manajemen Aset Klinik Firdaus')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
 <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
 <style>
     .stat-card {
@@ -155,9 +153,9 @@
         to { opacity: 1; transform: none; }
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="dashboard-container">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -166,8 +164,8 @@
             <p class="text-muted">Selamat datang di Sistem Manajemen Aset Klinik Firdaus</p>
         </div>
         <div class="text-end">
-            <p class="mb-0 text-muted">Tanggal: {{ now()->format('d F Y') }}</p>
-            <p class="mb-0 text-muted">Waktu: {{ now()->format('H:i') }}</p>
+            <p class="mb-0 text-muted">Tanggal: <?php echo e(now()->format('d F Y')); ?></p>
+            <p class="mb-0 text-muted">Waktu: <?php echo e(now()->format('H:i')); ?></p>
         </div>
     </div>
 
@@ -177,7 +175,7 @@
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h3>{{ $totalAssets }}</h3>
+                        <h3><?php echo e($totalAssets); ?></h3>
                         <p>Total Barang</p>
                     </div>
                     <i class="fas fa-boxes"></i>
@@ -188,7 +186,7 @@
             <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h3>{{ $totalKategori }}</h3>
+                        <h3><?php echo e($totalKategori); ?></h3>
                         <p>Kategori</p>
                     </div>
                     <i class="fas fa-tags"></i>
@@ -199,7 +197,7 @@
             <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h3>{{ $totalRuangan }}</h3>
+                        <h3><?php echo e($totalRuangan); ?></h3>
                         <p>Ruangan</p>
                     </div>
                     <i class="fas fa-door-open"></i>
@@ -210,8 +208,8 @@
             <div class="stat-card" style="background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h3>{{ $assetsLatestYear }}</h3>
-                        <p>Barang {{ $latestYear->tahun ?? '2025' }}</p>
+                        <h3><?php echo e($assetsLatestYear); ?></h3>
+                        <p>Barang <?php echo e($latestYear->tahun ?? '2025'); ?></p>
                     </div>
                     <i class="fas fa-calendar"></i>
                 </div>
@@ -246,8 +244,8 @@
                     <div class="mb-3">
                         <canvas id="recentAssetsChart" height="180"></canvas>
                     </div>
-                    @if($recentAssets->count() > 0)
-                        @foreach($recentAssets as $asset)
+                    <?php if($recentAssets->count() > 0): ?>
+                        <?php $__currentLoopData = $recentAssets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $asset): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="d-flex align-items-center mb-3 p-2 rounded recent-item-card animate-fade-in">
                                 <div class="me-3 flex-shrink-0">
                                     <div class="icon-circle bg-light shadow-sm">
@@ -256,25 +254,29 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-1">
-                                        <h6 class="mb-0 me-2">{{ $asset->jenisBarang->nama_barang }}</h6>
-                                        <span class="badge status-badge status-{{ strtolower(str_replace(' ', '-', $asset->kondisi->nama_kondisi)) }} ms-1">
-                                            {{ $asset->kondisi->nama_kondisi }}
+                                        <h6 class="mb-0 me-2"><?php echo e($asset->jenisBarang->nama_barang); ?></h6>
+                                        <span class="badge status-badge status-<?php echo e(strtolower(str_replace(' ', '-', $asset->kondisi->nama_kondisi))); ?> ms-1">
+                                            <?php echo e($asset->kondisi->nama_kondisi); ?>
+
                                         </span>
                                     </div>
                                     <div class="small text-muted mb-1">
-                                        <i class="fas fa-calendar-alt me-1"></i> {{ $asset->created_at->format('d M Y') }}
+                                        <i class="fas fa-calendar-alt me-1"></i> <?php echo e($asset->created_at->format('d M Y')); ?>
+
                                     </div>
                                     <div class="small text-muted">
-                                        <i class="fas fa-tag me-1"></i> {{ $asset->kategori->nama_kategori }}
+                                        <i class="fas fa-tag me-1"></i> <?php echo e($asset->kategori->nama_kategori); ?>
+
                                         <span class="mx-1">|</span>
-                                        <i class="fas fa-door-open me-1"></i> {{ $asset->ruangan->nama_ruangan }}
+                                        <i class="fas fa-door-open me-1"></i> <?php echo e($asset->ruangan->nama_ruangan); ?>
+
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    @else
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
                         <p class="text-muted text-center">Belum ada data barang</p>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -287,34 +289,34 @@
                     <div class="mb-3">
                         <canvas id="topRuanganChart" height="180"></canvas>
                     </div>
-                    @if($topRuangan->count() > 0)
-                        @php $maxBarang = $topRuangan->max('total'); @endphp
-                        @foreach($topRuangan as $i => $ruangan)
+                    <?php if($topRuangan->count() > 0): ?>
+                        <?php $maxBarang = $topRuangan->max('total'); ?>
+                        <?php $__currentLoopData = $topRuangan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $ruangan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="mb-3 animate-fade-in">
                                 <div class="d-flex align-items-center mb-1">
                                     <div class="icon-circle bg-light shadow-sm me-2">
                                         <i class="fas fa-door-open text-success"></i>
                                     </div>
-                                    <h6 class="mb-0 flex-grow-1">{{ $ruangan->ruangan->nama_ruangan }}</h6>
-                                    <span class="badge bg-primary ms-2">#{{ $i+1 }}</span>
+                                    <h6 class="mb-0 flex-grow-1"><?php echo e($ruangan->ruangan->nama_ruangan); ?></h6>
+                                    <span class="badge bg-primary ms-2">#<?php echo e($i+1); ?></span>
                                 </div>
                                 <div class="progress" style="height: 10px;">
-                                    <div class="progress-bar" role="progressbar" style="width: {{ $maxBarang > 0 ? round($ruangan->total/$maxBarang*100) : 0 }}%; background: linear-gradient(90deg,#7b6cf6,#5f4bb6);" aria-valuenow="{{ $ruangan->total }}" aria-valuemin="0" aria-valuemax="{{ $maxBarang }}"></div>
+                                    <div class="progress-bar" role="progressbar" style="width: <?php echo e($maxBarang > 0 ? round($ruangan->total/$maxBarang*100) : 0); ?>%; background: linear-gradient(90deg,#7b6cf6,#5f4bb6);" aria-valuenow="<?php echo e($ruangan->total); ?>" aria-valuemin="0" aria-valuemax="<?php echo e($maxBarang); ?>"></div>
                                 </div>
-                                <div class="small text-muted mt-1">{{ $ruangan->total }} barang</div>
+                                <div class="small text-muted mt-1"><?php echo e($ruangan->total); ?> barang</div>
                             </div>
-                        @endforeach
-                    @else
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
                         <p class="text-muted text-center">Belum ada data ruangan</p>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
 // Chart untuk kategori barang
@@ -322,9 +324,9 @@ const categoryCtx = document.getElementById('categoryChart').getContext('2d');
 const categoryChart = new Chart(categoryCtx, {
     type: 'doughnut',
     data: {
-        labels: {!! json_encode($assetsByCategory->pluck('kategori.nama_kategori')) !!},
+        labels: <?php echo json_encode($assetsByCategory->pluck('kategori.nama_kategori')); ?>,
         datasets: [{
-            data: {!! json_encode($assetsByCategory->pluck('total')) !!},
+            data: <?php echo json_encode($assetsByCategory->pluck('total')); ?>,
             backgroundColor: [
                 '#667eea',
                 '#764ba2',
@@ -352,10 +354,10 @@ const conditionCtx = document.getElementById('conditionChart').getContext('2d');
 const conditionChart = new Chart(conditionCtx, {
     type: 'bar',
     data: {
-        labels: {!! json_encode($assetsByCondition->pluck('kondisi.nama_kondisi')) !!},
+        labels: <?php echo json_encode($assetsByCondition->pluck('kondisi.nama_kondisi')); ?>,
         datasets: [{
             label: 'Jumlah Barang',
-            data: {!! json_encode($assetsByCondition->pluck('total')) !!},
+            data: <?php echo json_encode($assetsByCondition->pluck('total')); ?>,
             backgroundColor: [
                 '#28a745',
                 '#ffc107',
@@ -386,7 +388,7 @@ const conditionChart = new Chart(conditionCtx, {
 });
 
 // Chart untuk 5 barang terbaru
-const recentAssetsData = {!! json_encode($recentAssets->map(function($asset) {
+const recentAssetsData = <?php echo json_encode($recentAssets->map(function($asset) {
     return [
         'nama' => $asset->jenisBarang->nama_barang,
         'kategori' => $asset->kategori->nama_kategori,
@@ -394,7 +396,7 @@ const recentAssetsData = {!! json_encode($recentAssets->map(function($asset) {
         'kondisi' => $asset->kondisi->nama_kondisi,
         'tanggal' => $asset->created_at->format('d M Y'),
     ];
-})) !!};
+})); ?>;
 
 if (recentAssetsData.length) {
     const recentAssetsCtx = document.getElementById('recentAssetsChart').getContext('2d');
@@ -448,12 +450,12 @@ if (recentAssetsData.length) {
 }
 
 // Chart untuk ruangan dengan barang terbanyak
-const topRuanganData = {!! json_encode($topRuangan->map(function($item) {
+const topRuanganData = <?php echo json_encode($topRuangan->map(function($item) {
     return [
         'nama' => optional($item->ruangan)->nama_ruangan,
         'total' => $item->total,
     ];
-})) !!};
+})); ?>;
 
 if (topRuanganData.length) {
     const topRuanganCtx = document.getElementById('topRuanganChart').getContext('2d');
@@ -495,4 +497,5 @@ if (topRuanganData.length) {
     });
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\laragon\www\capstone-firdaus\resources\views/dashboard.blade.php ENDPATH**/ ?>

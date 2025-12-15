@@ -79,7 +79,7 @@
                                             $firstUnit = \App\Models\Asset::where('kode_inventaris', 'like', $barang['kode_inventaris_dasar'] . '.%')->orderBy('nomor_urut')->first();
                                         @endphp
                                         @if($firstUnit)
-                                            <form action="{{ route('assets.destroy', $firstUnit->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus barang ini beserta seluruh unitnya?')">
+                                            <form action="{{ route('assets.destroy', $firstUnit->id) }}" method="POST" class="d-inline" data-item-name="{{ $barang['kode_inventaris_dasar'] }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Grup Barang"><i class="fas fa-trash"></i></button>
